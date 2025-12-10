@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:collection/collection.dart';
+//  import 'package:bookstore_app/config.dart' as config;
 
 //  Custom DB DAO's
 /*
@@ -13,6 +14,10 @@ import 'package:collection/collection.dart';
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
 */
+
+//  Version, db preset
+//  dbName = config.kDBbName;
+//  dVersion = config.kVersion;
 
 //  AppDatabase onCreate
 class RDB {
