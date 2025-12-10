@@ -1,4 +1,5 @@
-import 'package:bookstore_app/view/home.dart';
+import 'package:bookstore_app/config.dart';
+import 'package:bookstore_app/view/login.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
@@ -13,7 +14,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbPath = await getDatabasesPath();
-  final path = join(dbPath, 'Todolist.db');
+  final path = join(dbPath, '$dbName.db');
   await deleteDatabase(path);
 
   runApp(const MyApp());
