@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
-  routes: [GoRoute(path: '/', builder: (context, state) => Home())],
+  routes: [GoRoute(path: '/', builder: (context, state) => Login())],
   // routes: [GoRoute(path: '/settings', builder: (context, state) => Settings(onChangeTheme: _changeTheme))],
 );
 Future<void> main() async {
