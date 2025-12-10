@@ -6,6 +6,9 @@
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: AppliedSale Model
+
+  DateTime MUST converted using value.toIso8601String()
+  Stored DateTime in String MUST converted using DateTime.parse(value);
 */
 
 class AppliedSale {
