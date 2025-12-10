@@ -32,5 +32,5 @@ class AppliedSale {
       totalDiscount = (map['totalDiscount'] as num).toDouble(),
       calctype = map['calctype'] as String;
 
-  static const List<String> keys = ['id', 'pid', 'asid', 'pdid', 'returnDate', 'unitPrice', 'quantity'];
+  static const List<String> keys = ['id', 'sid', 'totalDiscount', 'calctype'];
 }
