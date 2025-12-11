@@ -1,6 +1,7 @@
 import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/view/cheng/login_screen.dart';
 import 'package:bookstore_app/view/login.dart';
+import 'package:bookstore_app/view/search_view.dart';
 import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -11,7 +12,7 @@ final GoRouter router = GoRouter(
 
   initialLocation: config.routeLogin,
   routes: [
-    GoRoute(path: config.routeLogin, builder: (context, state) => LoginScreen()),
+    GoRoute(path: config.routeLogin, builder: (context, state) => SearchView()),
     GoRoute(
       path: config.routeSettings,
       builder: (context, state) => SettingPage(),

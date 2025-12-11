@@ -4,6 +4,7 @@ import 'package:bookstore_app/model/product/manufacturer.dart';
 import 'package:bookstore_app/model/product/product.dart';
 import 'package:bookstore_app/model/product/product_base.dart';
 import 'package:bookstore_app/model/product/product_image.dart';
+import 'package:bookstore_app/mv/oncrate.dart';
 import 'package:flutter/material.dart';
 
 class SearchView extends StatefulWidget {
@@ -18,19 +19,22 @@ class _SearchViewState extends State<SearchView> {
   late Product dProduct; //  Dummy Product
   late ProductBase dProductBase; //  Dummy ProductBase
   late ProductImage dProductImage; //  Dummy ProductImage
-  late Manufacturer dManufacturer;  //  Dummy Manufacturer
-  late Product product;
+  late Manufacturer dManufacturer; //  Dummy Manufacturer
+  Product? product;
+  ProductBase? productBase;
   final String dbName = '${config.kDBName}${config.kDBFileExt}';
   final int dVersion = config.kVersion;
 
   @override
   void initState() {
     super.initState();
+    product = Product(pbid: 1, mfid: 1, color: '1', size: 1, basePrice: 1);
     //  FK를 이용한 Product 조립(Product, ProductBase, ProductImage, Manufacturer)
     svInitDB();
   }
 
   Future<void> svInitDB() async {
+    await DBCreation.creation(dbName, dVersion);
     final productDAO = RDAO<Product>(
       dbName: dbName,
       tableName: config.kTableProduct,
@@ -63,9 +67,12 @@ class _SearchViewState extends State<SearchView> {
       pCategory: 'Dummy Category',
       pModelNumber: 'Hebi.2',
     );
-    await productbaseDAO.insertK(dProductBase.toMap());
-    dProductImage = ProductImage(pbid: dProductBase.id, imagePath: 'Dummy Image');
-    await productImageDAO.insertK(dProductImage.toMap());
+    dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
+    dProductImage = ProductImage(
+      pbid: dProductBase.id,
+      imagePath: 'Dummy Image',
+    );
+    dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
     await manufacturerDAO.insertK(dManufacturer.toMap());
     dProduct = Product(
@@ -77,10 +84,11 @@ class _SearchViewState extends State<SearchView> {
     );
     await productDAO.insertK(dProduct.toMap());
     product = await productDAO.queryK({'id': 1});
+    productBase = await productbaseDAO.queryK({'id': product!.id});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text('${product.id}')));
+    return Scaffold(appBar: AppBar(title: Text('${productBase!.pName}')));
   }
 }
