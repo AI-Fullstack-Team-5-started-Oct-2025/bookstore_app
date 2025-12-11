@@ -9,7 +9,8 @@ import 'package:sqflite/sqflite.dart';
   Update log: 
     9/29/2025 09:53, 'Point 1, CRUD table using keys', Creator: Chansol, Park
     9/29/2025 11:17, 'Delete OBSOLETE Functions', Creator: Chansol, Park
-    9/29/2025 11:28, 'Point 2, Total class refactored by GPT', Creator: Chansol, Park
+    11/29/2025 11:28, 'Point 2, Total class refactored by GPT', Creator: Chansol, Park
+    11/29/2025 11:28, 'Point 3, Customer, Employee added', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
@@ -39,7 +40,6 @@ class DBCreation {
             id integer primary key autoincrement,
             pbid integer,
             mfid integer,
-            color text,
             size integer,
             basePrice integer
           )
@@ -51,6 +51,7 @@ class DBCreation {
             id integer primary key autoincrement,
             pName text,
             pDescription text,
+            pColor text,
             pGender text,
             pStatus text,
             pFeatureType text,
@@ -67,12 +68,35 @@ class DBCreation {
           )
         ''');
 
-        //  Image
+        //  ProductImage
         await db.execute('''
           create table ProductImage (
             id integer primary key autoincrement,
             pbid integer,
             imagePath text
+          )
+        ''');
+
+        //  Point3
+        //  Customer
+        await db.execute('''
+          create table Customer (
+            id integer primary key autoincrement,
+            cEmail text,
+            cPhoneNumber text,
+            cPname text,
+            cPassword text
+          )
+        ''');
+        
+        //  Employee
+        await db.execute('''
+          create table Employee (
+            id integer primary key autoincrement,
+            eEmail text,
+            ePhoneNumber text,
+            eName text,
+            ePassword text
           )
         ''');
       },

@@ -32,7 +32,6 @@ class _SearchViewState extends State<SearchView> {
   @override
   void initState() {
     super.initState();
-    product = Product(pbid: 1, mfid: 1, color: '1', size: 1, basePrice: 1);
     //  FK를 이용한 Product 조립(Product, ProductBase, ProductImage, Manufacturer)
     svInitDB();
   }
@@ -66,6 +65,7 @@ class _SearchViewState extends State<SearchView> {
     dProductBase = ProductBase(
       pName: 'Dummy',
       pDescription: 'This is Dummy description',
+      pColor: 'Black',
       pGender: 'Male',
       pStatus: 'Null',
       pCategory: 'Dummy Category',
@@ -74,7 +74,8 @@ class _SearchViewState extends State<SearchView> {
     dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
     dProductImage = ProductImage(
       pbid: dProductBase.id,
-      imagePath: '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
+      imagePath:
+          '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
     );
     dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
@@ -82,7 +83,6 @@ class _SearchViewState extends State<SearchView> {
     dProduct = Product(
       pbid: dProductBase.id,
       mfid: dManufacturer.id,
-      color: 'color',
       size: 250,
       basePrice: 10500,
     );
@@ -111,15 +111,20 @@ class _SearchViewState extends State<SearchView> {
         ),
         centerTitle: true,
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
         child: Column(
           children: [
-            
-            Image.asset(
-              productImage!.imagePath,
+            SizedBox(
+              height: 300,
               width: MediaQuery.sizeOf(context).width,
-              height: 150,
+              child: Image.asset(
+                productImage!.imagePath,
+                width: MediaQuery.sizeOf(context).width,
+                height: 150,
+              ),
             ),
+            Text('\n\n\n\n'),
             Text('data'),
           ],
         ),
