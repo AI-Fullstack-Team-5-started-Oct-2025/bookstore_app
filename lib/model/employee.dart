@@ -12,33 +12,33 @@
 class Employee {
   // Properties
   int? id;
-  final String eemail;
-  final String ephoneNumber;
-  final String ename;
-  final String epassword;
+  final String eEmail;
+  final String ePhoneNumber;
+  final String eName;
+  final String ePassword;
 
   // Constructor
   Employee({
     this.id,
-    required this.eemail,
-    required this.ephoneNumber,
-    required this.ename,
-    required this.epassword,
+    required this.eEmail,
+    required this.ePhoneNumber,
+    required this.eName,
+    required this.ePassword,
   });
 
   Employee.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
-      eemail = map['eemail'] as String,
-      ephoneNumber = map['ephoneNumber'] as String,
-      ename = map['ename'] as String,
-      epassword = map['epassword'] as String;
+      eEmail = map['eEmail'] as String,
+      ePhoneNumber = map['ePhoneNumber'] as String,
+      eName = map['eName'] as String,
+      ePassword = map['ePassword'] as String;
 
   Map<String, Object?> toMap({bool includeId = false}) {
     final map = <String, Object?>{
-      'eemail': eemail,
-      'ephoneNumber': ephoneNumber,
-      'ename': ename,
-      'epassword': epassword,
+      'eEmail': eEmail,
+      'ePhoneNumber': ePhoneNumber,
+      'eName': eName,
+      'ePassword': ePassword,
     };
 
     if (includeId) {
@@ -50,9 +50,9 @@ class Employee {
 
   static const List<String> keys = [
     'id',
-    'eemail',
-    'ephoneNumber',
-    'ename',
-    'epassword',
+    'eEmail',
+    'ePhoneNumber',
+    'eName',
+    'ePassword',
   ];
 }

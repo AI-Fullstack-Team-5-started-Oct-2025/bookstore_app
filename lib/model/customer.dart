@@ -12,33 +12,33 @@
 class Customer {
   // Properties
   int? id;
-  final String cemail;
-  final String cphoneNumber;
-  final String cname;
-  final String cpassword;
+  final String cEmail;
+  final String cPhoneNumber;
+  final String cPname;
+  final String cPassword;
 
   // Constructor
   Customer({
     this.id,
-    required this.cemail,
-    required this.cphoneNumber,
-    required this.cname,
-    required this.cpassword,
+    required this.cEmail,
+    required this.cPhoneNumber,
+    required this.cPname,
+    required this.cPassword,
   });
 
   Customer.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
-      cemail = map['cemail'] as String,
-      cphoneNumber = map['cphoneNumber'] as String,
-      cname = map['cname'] as String,
-      cpassword = map['cpassword'] as String;
+      cEmail = map['cEmail'] as String,
+      cPhoneNumber = map['cPhoneNumber'] as String,
+      cPname = map['cPname'] as String,
+      cPassword = map['cPassword'] as String;
 
   Map<String, Object?> toMap({bool includeId = false}) {
     final map = <String, Object?>{
-      'cemail': cemail,
-      'cphoneNumber': cphoneNumber,
-      'cname': cname,
-      'cpassword': cpassword,
+      'cEmail': cEmail,
+      'cPhoneNumber': cPhoneNumber,
+      'cPname': cPname,
+      'cPassword': cPassword,
     };
 
     if (includeId) {
@@ -50,9 +50,9 @@ class Customer {
 
   static const List<String> keys = [
     'id',
-    'cemail',
-    'cphoneNumber',
-    'cname',
-    'cpassword',
+    'cEmail',
+    'cPhoneNumber',
+    'cPname',
+    'cPassword',
   ];
 }
