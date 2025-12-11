@@ -1,19 +1,28 @@
-import 'package:bookstore_app/view/home.dart';
+import 'package:bookstore_app/config.dart' as config;
+import 'package:bookstore_app/view/login.dart';
+import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/',
-  routes: [GoRoute(path: '/', builder: (context, state) => Home())],
-  // routes: [GoRoute(path: '/settings', builder: (context, state) => Settings(onChangeTheme: _changeTheme))],
+
+  initialLocation: config.routeLogin,
+  routes: [
+    GoRoute(path: config.routeLogin, builder: (context, state) => Login()),
+    GoRoute(
+      path: config.routeSettings,
+      builder: (context, state) => SettingPage(),
+    ),
+  ],
 );
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbPath = await getDatabasesPath();
-  final path = join(dbPath, 'Todolist.db');
+
+  final path = join(dbPath, '${config.kDBName}${config.kDBFileExt}');
   await deleteDatabase(path);
 
   runApp(const MyApp());
@@ -28,11 +37,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system; //  시스템에서 설정한 색상으로 초기화를 한다.
-  Color seedColor = Colors.deepPurple;
 
-  _changeTheme(ThemeMode inputThemeMode, Color inputColorScheme) {
+  Color _seedColor = Colors.deepPurple;
+
+  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
-    seedColor = inputColorScheme;
+    _seedColor = inputColorScheme;
     setState(() {});
   }
 
@@ -44,11 +54,12 @@ class _MyAppState extends State<MyApp> {
       themeMode: _themeMode,
       theme: ThemeData(
         brightness: Brightness.light,
-        colorSchemeSeed: seedColor,
+
+        colorSchemeSeed: _seedColor,
       ),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
-        colorSchemeSeed: seedColor,
+        colorSchemeSeed: _seedColor,
       ),
     );
   }
