@@ -16,6 +16,7 @@ class Product {
   int? id;
   int? pbid;
   int? mfid;
+  final String color;
   final int size;
   final int basePrice;
 
@@ -24,6 +25,7 @@ class Product {
     this.id,
     this.pbid,
     this.mfid,
+    required this.color,
     required this.size,
     required this.basePrice,
   });
@@ -32,8 +34,9 @@ class Product {
     : id = map['id'] as int?,
       pbid = map['pbid'] as int?,
       mfid = map['mfid'] as int?,
+      color = map['color'] as String,
       size = map['size'] as int,
       basePrice = map['basePrice'] as int;
 
-  static const List<String> keys = ['id', 'pbid', 'mfid', 'size', 'basePrice'];
+  static const List<String> keys = ['id', 'pbid', 'mfid', 'color', 'size', 'basePrice'];
 }

@@ -40,7 +40,7 @@ class _MyAppState extends State<MyApp> {
 
   Color _seedColor = Colors.deepPurple;
 
-  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
+  void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
     _seedColor = inputColorScheme;
     setState(() {});
