@@ -1,4 +1,4 @@
-//  Images Model
+//  ProductImage Model
 /*
   Create: 10/12/2025 14:13, Creator: Chansol, Park
   Update log: 
@@ -6,22 +6,22 @@
     11/12/2025 13:38, 'Point 1, toMap', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
-  Desc: Images Model
+  Desc: ProductImage Model
 
   DateTime MUST converted using value.toIso8601String()
   Stored DateTime in String MUST converted using DateTime.parse(value);
 */
 
-class Image {
+class ProductImage {
   // Properties
   int? id;
   int? pbid; //  ProductBase id
   final String imagePath;
 
   // Constructor
-  Image({this.id, this.pbid, required this.imagePath});
+  ProductImage({this.id, required this.pbid, required this.imagePath});
 
-  Image.fromMap(Map<String, Object?> map)
+  ProductImage.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
       pbid = map['pbid'] as int?,
       imagePath = map['imagePath'] as String;
