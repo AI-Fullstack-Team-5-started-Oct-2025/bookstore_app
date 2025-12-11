@@ -56,7 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
               ),
-
               // 입력 필드 영역
               CustomPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
