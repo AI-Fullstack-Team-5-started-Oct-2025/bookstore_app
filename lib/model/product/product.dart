@@ -14,8 +14,8 @@
 class Product {
   // Properties
   int? id;
-  int? pbid; //  ProductBase id
-  int? mfid; //  Manufacturer id
+  int? pbid;  //  ProductBase id
+  int? mfid;  //  Manufacturer id
   final String color;
   final int size;
   final int basePrice;
@@ -23,8 +23,8 @@ class Product {
   // Constructor
   Product({
     this.id,
-    required this.pbid,
-    required this.mfid,
+    this.pbid,
+    this.mfid,
     required this.color,
     required this.size,
     required this.basePrice,
@@ -32,34 +32,11 @@ class Product {
 
   Product.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
-      pbid = map['pbid'] as int?, //  ProductBase id
+      pbid = map['pbid'] as int?,
       mfid = map['mfid'] as int?,
       color = map['color'] as String,
       size = map['size'] as int,
       basePrice = map['basePrice'] as int;
 
-  Map<String, Object?> toMap({bool includeId = false}) {
-    final map = <String, Object?>{
-      'pbid': pbid,
-      'mfid': mfid,
-      'color': color,
-      'size': size,
-      'basePrice': basePrice,
-    };
-
-    if (includeId) {
-      map['id'] = id;
-    }
-
-    return map;
-  }
-
-  static const List<String> keys = [
-    'id',
-    'pbid',
-    'mfid',
-    'color',
-    'size',
-    'basePrice',
-  ];
+  static const List<String> keys = ['id', 'pbid', 'mfid', 'color', 'size', 'basePrice'];
 }
