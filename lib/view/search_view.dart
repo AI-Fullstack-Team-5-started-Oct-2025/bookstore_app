@@ -22,6 +22,7 @@ class _SearchViewState extends State<SearchView> {
   late Manufacturer dManufacturer; //  Dummy Manufacturer
 
   Product? product;
+  List<Product>? productSizes;
   ProductBase? productBase;
   ProductImage? productImage;
   Manufacturer? manufacturer;
@@ -74,7 +75,8 @@ class _SearchViewState extends State<SearchView> {
     dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
     dProductImage = ProductImage(
       pbid: dProductBase.id,
-      imagePath: '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
+      imagePath:
+          '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
     );
     dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
@@ -86,10 +88,13 @@ class _SearchViewState extends State<SearchView> {
       basePrice: 10500,
     );
     dProduct.id = await productDAO.insertK(dProduct.toMap());
-    product = await productDAO.queryK({'id': dProduct.id});
-    productBase = await productbaseDAO.queryK({'id': product!.pbid});
-    productImage = await productImageDAO.queryK({'pbid': product!.pbid});
-    manufacturer = await manufacturerDAO.queryK({'id': product!.mfid});
+    product = (await productDAO.queryK({'id': dProduct.id})).first;
+    productBase = (await productbaseDAO.queryK({'id': product!.pbid})).first;
+    productSizes = await productDAO.queryK({'pbid': productBase!.id});
+    productImage = (await productImageDAO.queryK({
+      'pbid': product!.pbid,
+    })).first;
+    manufacturer = (await manufacturerDAO.queryK({'id': product!.mfid})).first;
 
     setState(() {});
   }
@@ -116,7 +121,6 @@ class _SearchViewState extends State<SearchView> {
         child: Column(
           children: [
             Center(
-
               child: Image.asset(
                 productImage!.imagePath,
                 width: MediaQuery.sizeOf(context).width * 0.9,
@@ -125,19 +129,57 @@ class _SearchViewState extends State<SearchView> {
             ),
             SizedBox(height: 40),
             Align(
-              alignment: AlignmentGeometry.topLeft,
+              alignment: Alignment.topLeft,
               child: Text(
                 '     상품명: ${productBase!.pName}',
                 style: config.rLabel,
               ),
             ),
-            SizedBox(height: 25),
+            SizedBox(height: 40),
             Align(
-              alignment: AlignmentGeometry.topLeft,
+              alignment: Alignment.topLeft,
               child: Text(
                 '     가격: ${config.priceFormatter.format(product!.basePrice)}',
                 style: config.rLabel,
               ),
+            ),
+            SizedBox(height: 40),
+            Align(
+              alignment: Alignment.topLeft,
+              child: Text('     사이즈', style: config.rLabel),
+            ),
+            Row(
+              children: [
+                SizedBox(
+                  height: 50, // 높이 지정해야 가로 리스트가 보임
+                  child: SizedBox(
+                    height: 50,
+                    width: MediaQuery.sizeOf(context).width, // 또는 Expanded로 감싸기
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: productSizes?.length ?? 0,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        final size = productSizes![index].size;
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            size.toString(),
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
