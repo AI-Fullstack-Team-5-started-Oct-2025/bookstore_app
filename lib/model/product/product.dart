@@ -14,8 +14,8 @@
 class Product {
   // Properties
   int? id;
-  int? pbid;
-  int? mfid;
+  int? pbid;  //  ProductBase id
+  int? mfid;  //  Manufacturer id
   final String color;
   final int size;
   final int basePrice;

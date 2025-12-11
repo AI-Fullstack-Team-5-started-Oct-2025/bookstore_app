@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 //  DB
 //  For use
-//  ${config.kDBName}${config.kDBFileExt}
+//  '${config.kDBName}${config.kDBFileExt}';
 const String kDBName = 'bookstore';
 const String kDBFileExt = '.db';
 const int kVersion = 1;
@@ -48,10 +48,11 @@ const bool kUseLocalDBOnly = true;
 
 //  Tables
 const String kTableCustomer = 'Customer';
-//  const String kTableImage = 'Image';
-//  const String kTableManufacturer = 'Manufacturer';
-//  const String kTableProductBase = 'ProductBase';
-//  const String kTableProduct = 'Product';
+const String kTableImage = 'Image';
+const String kTableProductBase = 'ProductBase';
+const String kTableManufacturer = 'Manufacturer';
+const String kTableProduct = 'Product';
+
 
 //  Routes
 const String routeLogin = '/';
