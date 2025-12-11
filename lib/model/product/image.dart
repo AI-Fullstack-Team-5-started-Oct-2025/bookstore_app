@@ -14,7 +14,7 @@
 class Image {
   // Properties
   int? id;
-  int? pbid;
+  int? pbid;  //  ProductBase id
   final String imagePath;
 
   // Constructor

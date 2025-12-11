@@ -14,7 +14,7 @@
 class ProductBase {
   // Properties
   int? id;
-  int? pid;
+  int? pid; //  Product id
   final String pName;
   final String pDescription;
   final String pGender;
