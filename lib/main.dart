@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:bookstore_app/mv/oncrate.dart';
 
 final GoRouter router = GoRouter(
-
   initialLocation: config.routeLogin,
   routes: [
     GoRoute(path: config.routeLogin, builder: (context, state) => SearchView()),
@@ -27,6 +27,10 @@ Future<void> main() async {
   final path = join(dbPath, '${config.kDBName}${config.kDBFileExt}');
   await deleteDatabase(path);
 
+  final String dbName = '${config.kDBName}${config.kDBFileExt}';
+  final int dVersion = config.kVersion;
+  await DBCreation.creation(dbName, dVersion);
+
   runApp(const MyApp());
 }
 
@@ -42,7 +46,7 @@ class _MyAppState extends State<MyApp> {
 
   Color _seedColor = Colors.deepPurple;
 
-  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
+  void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
     _seedColor = inputColorScheme;
     setState(() {});
