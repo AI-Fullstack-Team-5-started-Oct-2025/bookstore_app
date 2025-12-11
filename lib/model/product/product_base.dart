@@ -17,6 +17,7 @@ class ProductBase {
   int? id;
   final String pName;
   final String pDescription;
+  final String pColor;
   final String pGender;
   final String pStatus; //  active, coming soon, inactive etc
   final String pCategory; //  sneakers, sandals, boots
@@ -27,6 +28,7 @@ class ProductBase {
     this.id,
     required this.pName,
     required this.pDescription,
+    required this.pColor,
     required this.pGender,
     required this.pStatus,
     required this.pCategory,
@@ -37,6 +39,7 @@ class ProductBase {
     : id = map['id'] as int?,
       pName = map['pName'] as String,
       pDescription = map['pDescription'] as String,
+      pColor = map['pColor'] as String,
       pGender = map['pGender'] as String,
       pStatus = map['pStatus'] as String,
       pCategory = map['pCategory'] as String,
@@ -46,6 +49,7 @@ class ProductBase {
     final map = <String, Object?>{
       'pName': pName,
       'pDescription': pDescription,
+      'pColor': pColor,
       'pGender': pGender,
       'pStatus': pStatus,
       'pCategory': pCategory,
@@ -63,6 +67,7 @@ class ProductBase {
     'id',
     'pName',
     'pDescription',
+    'pColor',
     'pGender',
     'pStatus',
     'pCategory',
