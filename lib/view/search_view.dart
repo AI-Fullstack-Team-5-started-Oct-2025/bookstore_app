@@ -23,14 +23,17 @@ class _SearchViewState extends State<SearchView> {
     svDummy();
   }
 
-  Future<void> svDummy() async{
-    await RDAO(dbName: dbName, tableName: tableName, dVersion: dVersion, fromMap: (<Product>) {
-      
-    },);
+  Future<void> svDummy() async {
+    await RDAO(
+      dbName: dbName,
+      tableName: tableName,
+      dVersion: dVersion,
+      fromMap: Product.fromMap,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text('data'),),);
+    return Scaffold(appBar: AppBar(title: Text('data')));
   }
 }
