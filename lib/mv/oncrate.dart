@@ -16,7 +16,7 @@ import 'package:sqflite/sqflite.dart';
 */
 
 //  Version, db preset
-final String dbName = config.kDBName;
+final String dbName = '${config.kDBName}${config.kDBFileExt}';
 final int dVersion = config.kVersion;
 
 //  AppDatabase onCreate
@@ -26,7 +26,7 @@ class DBCreation {
   static Future<Database> creation(String dbName, int dVersion) async {
     if (_db != null) return _db!;
 
-    final path = join(await getDatabasesPath(), '$dbName.db');
+    final path = join(await getDatabasesPath(), dbName);
 
     _db = await openDatabase(
       path,
@@ -49,7 +49,6 @@ class DBCreation {
         await db.execute('''
           create table ProductBase (
             id integer primary key autoincrement,
-            pid integer,
             pName text,
             pDescription text,
             pGender text,

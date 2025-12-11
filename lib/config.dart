@@ -52,6 +52,7 @@ const String kTableProductImage = 'ProductImage';
 const String kTableProductBase = 'ProductBase';
 const String kTableManufacturer = 'Manufacturer';
 const String kTableProduct = 'Product';
+const String tTableEmployee = 'Employee';
 
 
 //  Routes
