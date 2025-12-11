@@ -48,6 +48,10 @@ const bool kUseLocalDBOnly = true;
 
 //  Tables
 const String kTableCustomer = 'Customer';
+//  const String kTableImage = 'Image';
+//  const String kTableManufacturer = 'Manufacturer';
+//  const String kTableProductBase = 'ProductBase';
+//  const String kTableProduct = 'Product';
 
 //  Routes
 const String routeLogin = '/';
