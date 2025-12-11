@@ -106,7 +106,7 @@ class RDAO<T> {
   }
 
   //  DBHandler.queryK('Key': 1)
-  Future<T> queryK(Map<String, Object?> keyList) async {
+  Future<List<T>> queryK(Map<String, Object?> keyList) async {
     if (keyList.isEmpty) {
       throw ArgumentError('keyList must NOT be empty');
     }
@@ -119,7 +119,7 @@ class RDAO<T> {
     if (results.isEmpty) {
       throw Exception('EMPTY');
     }
-    return fromMap(results.first);
+    return results.map((e) => fromMap(e)).toList();
   }
 
   //  DBHandler.insertK(Tablename.toMap());
