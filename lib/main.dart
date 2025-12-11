@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system; //  시스템에서 설정한 색상으로 초기화를 한다.
   Color _seedColor = Colors.deepPurple;
 
-  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
+  void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
     _seedColor = inputColorScheme;
     setState(() {});
