@@ -3,11 +3,14 @@
   Create: 10/12/2025 16:43, Creator: Chansol, Park
   Update log: 
     DUMMY 9/29/2025 09:53, 'Point X, Description', Creator: Chansol, Park
+    11/29/2025 17:40, 'Point 1, Searchview presets', Creator: Chansol, Park
+    11/29/2025 17:52, 'Point 2, Price format preset', Creator: Chansol, Park
   Version: 1.0
   Desc: Config for dbName, version, etc.
 */
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 //  DB
 //  For use
@@ -31,6 +34,7 @@ const String kDefaultProductImage = '${kImageAssetPath}default.png';  //  Defaul
 //  Formats
 const String dateFormat = 'yyyy-MM-dd';
 const String dateTimeFormat = 'yyyy-MM-dd HH:mm:ss';
+final NumberFormat priceFormatter = NumberFormat('#,###.##');
 const int minPasswordLength = 8;
 const int maxPasswordLength = 20;
 
@@ -40,6 +44,9 @@ final RegExp emailRegex = RegExp(
 const int kDefaultPageSize = 20;  //  Pagenation
 const Duration kApiTimeout = Duration(seconds: 10); //  App timeout
 const Duration kLoginDelay = Duration(seconds: 2);  //  Delay when pressing Login button
+
+//  Searchview presets
+const TextStyle rLabel = TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
 
 //  Features
 const bool kEnableSaleFeature = true;
