@@ -19,7 +19,6 @@ class _SearchViewState extends State<SearchView> {
   late ProductBase dProductBase; //  Dummy ProductBase
   late ProductImage dProductImage; //  Dummy ProductImage
   late Manufacturer dManufacturer;
-  late Product product; //  Get.arguments?
   final String dbName = '${config.kDBName}${config.kDBFileExt}';
   final int dVersion = config.kVersion;
 
@@ -76,6 +75,7 @@ class _SearchViewState extends State<SearchView> {
       basePrice: 10500,
     );
     await productDAO.insertK(dProduct.toMap());
+    final product = await productDAO.queryAll();
   }
 
   @override
