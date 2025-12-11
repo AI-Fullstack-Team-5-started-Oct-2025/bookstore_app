@@ -105,6 +105,7 @@ class RDAO<T> {
     return results.map((e) => fromMap(e)).toList();
   }
 
+  //  DBHandler.queryK('Key': 1)
   Future<T> queryK(Map<String, Object?> keyList) async {
     if (keyList.isEmpty) {
       throw ArgumentError('keyList must NOT be empty');
@@ -121,6 +122,7 @@ class RDAO<T> {
     return fromMap(results.first);
   }
 
+  //  DBHandler.insertK(Tablename.toMap());
   Future<int> insertK(Map<String, Object?> data) async {
     final db = await RDB.instance(dbName, dVersion);
     final keys = data.keys.join(', ');
@@ -129,6 +131,7 @@ class RDAO<T> {
     return db.rawInsert(sql, data.values.toList());
   }
 
+  // DBHandler.updateK(Tablename.toMap(), KeyListTable.toMap())
   Future<int> updateK(
     Map<String, Object?> data,
     Map<String, Object?> keyList,
