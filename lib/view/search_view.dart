@@ -74,8 +74,7 @@ class _SearchViewState extends State<SearchView> {
     dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
     dProductImage = ProductImage(
       pbid: dProductBase.id,
-      imagePath:
-          '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
+      imagePath: '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
     );
     dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
@@ -117,6 +116,7 @@ class _SearchViewState extends State<SearchView> {
         child: Column(
           children: [
             Center(
+
               child: Image.asset(
                 productImage!.imagePath,
                 width: MediaQuery.sizeOf(context).width * 0.9,
