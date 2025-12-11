@@ -25,7 +25,7 @@ class _SearchViewState extends State<SearchView> {
   ProductBase? productBase;
   ProductImage? productImage;
   Manufacturer? manufacturer;
-  
+
   final String dbName = '${config.kDBName}${config.kDBFileExt}';
   final int dVersion = config.kVersion;
 
@@ -74,7 +74,7 @@ class _SearchViewState extends State<SearchView> {
     dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
     dProductImage = ProductImage(
       pbid: dProductBase.id,
-      imagePath: 'Dummy Image',
+      imagePath: '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
     );
     dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
@@ -89,15 +89,15 @@ class _SearchViewState extends State<SearchView> {
     dProduct.id = await productDAO.insertK(dProduct.toMap());
     product = await productDAO.queryK({'id': dProduct.id});
     productBase = await productbaseDAO.queryK({'id': product!.pbid});
-    productImage = await productImageDAO.queryK({'id': dProductImage.id});
-    manufacturer = await manufacturerDAO.queryK({'id': 1});
+    productImage = await productImageDAO.queryK({'pbid': product!.pbid});
+    manufacturer = await manufacturerDAO.queryK({'id': product!.mfid});
 
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (productBase == null) {
+    if (productBase == null || productImage == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Loading...')),
         body: const Center(child: CircularProgressIndicator()),
@@ -106,7 +106,7 @@ class _SearchViewState extends State<SearchView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${productBase!.pName}',
+          productBase!.pName,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
@@ -114,7 +114,13 @@ class _SearchViewState extends State<SearchView> {
       body: Center(
         child: Column(
           children: [
-            Text('data')
+            
+            Image.asset(
+              productImage!.imagePath,
+              width: MediaQuery.sizeOf(context).width,
+              height: 150,
+            ),
+            Text('data'),
           ],
         ),
       ),
