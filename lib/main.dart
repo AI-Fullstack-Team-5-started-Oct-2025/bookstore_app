@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 final GoRouter router = GoRouter(
+
   initialLocation: config.routeLogin,
   routes: [
     GoRoute(path: config.routeLogin, builder: (context, state) => Login()),
@@ -20,6 +21,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final dbPath = await getDatabasesPath();
+
   final path = join(dbPath, '${config.kDBName}${config.kDBFileExt}');
   await deleteDatabase(path);
 
@@ -35,6 +37,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = ThemeMode.system; //  시스템에서 설정한 색상으로 초기화를 한다.
+
   Color _seedColor = Colors.deepPurple;
 
   void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
@@ -51,6 +54,7 @@ class _MyAppState extends State<MyApp> {
       themeMode: _themeMode,
       theme: ThemeData(
         brightness: Brightness.light,
+
         colorSchemeSeed: _seedColor,
       ),
       darkTheme: ThemeData(

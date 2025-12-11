@@ -53,6 +53,7 @@ const String kTableProductBase = 'ProductBase';
 const String kTableManufacturer = 'Manufacturer';
 const String kTableProduct = 'Product';
 
+
 //  Routes
 const String routeLogin = '/';
 const String routeSettings = '/settings';
