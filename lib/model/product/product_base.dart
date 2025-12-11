@@ -26,7 +26,7 @@ class ProductBase {
   // Constructor
   ProductBase({
     this.id,
-    this.pid,
+    required this.pid,
     required this.pName,
     required this.pDescription,
     required this.pGender,

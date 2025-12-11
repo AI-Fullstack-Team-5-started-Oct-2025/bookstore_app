@@ -1,3 +1,6 @@
+
+import 'package:flutter/material.dart';
+
 //  Configuration of the App
 /*
   Create: 10/12/2025 16:43, Creator: Chansol, Park
@@ -6,8 +9,6 @@
   Version: 1.0
   Desc: Config for dbName, version, etc.
 */
-
-import 'package:flutter/material.dart';
 
 //  DB
 //  For use
