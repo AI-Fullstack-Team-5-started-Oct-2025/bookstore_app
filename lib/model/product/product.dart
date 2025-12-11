@@ -16,7 +16,6 @@ class Product {
   int? id;
   int? pbid; //  ProductBase id
   int? mfid; //  Manufacturer id
-  final String color;
   final int size;
   final int basePrice;
 
@@ -25,7 +24,6 @@ class Product {
     this.id,
     required this.pbid,
     required this.mfid,
-    required this.color,
     required this.size,
     required this.basePrice,
   });
@@ -34,7 +32,6 @@ class Product {
     : id = map['id'] as int?,
       pbid = map['pbid'] as int?, //  ProductBase id
       mfid = map['mfid'] as int?,
-      color = map['color'] as String,
       size = map['size'] as int,
       basePrice = map['basePrice'] as int;
 
@@ -42,7 +39,6 @@ class Product {
     final map = <String, Object?>{
       'pbid': pbid,
       'mfid': mfid,
-      'color': color,
       'size': size,
       'basePrice': basePrice,
     };
@@ -58,7 +54,6 @@ class Product {
     'id',
     'pbid',
     'mfid',
-    'color',
     'size',
     'basePrice',
   ];
