@@ -42,6 +42,7 @@ dependencies:
   go_router: ^17.0.0
   # Getx
   get: ^4.7.3
+
   #GetX Storage
   get_storage: ^2.1.1 
   # intl
