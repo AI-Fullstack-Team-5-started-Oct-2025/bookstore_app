@@ -74,7 +74,8 @@ class _SearchViewState extends State<SearchView> {
     dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
     dProductImage = ProductImage(
       pbid: dProductBase.id,
-      imagePath: '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
+      imagePath:
+          '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
     );
     dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
@@ -104,6 +105,7 @@ class _SearchViewState extends State<SearchView> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text(
           productBase!.pName,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -114,18 +116,29 @@ class _SearchViewState extends State<SearchView> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
-
-            SizedBox(
-              height: 300,
-              width: MediaQuery.sizeOf(context).width,
+            Center(
               child: Image.asset(
                 productImage!.imagePath,
-                width: MediaQuery.sizeOf(context).width,
-                height: 150,
+                width: MediaQuery.sizeOf(context).width * 0.9,
+                height: 280,
               ),
             ),
-            Text('\n\n\n\n'),
-            Text('data'),
+            SizedBox(height: 40),
+            Align(
+              alignment: AlignmentGeometry.topLeft,
+              child: Text(
+                '     상품명: ${productBase!.pName}',
+                style: config.rLabel,
+              ),
+            ),
+            SizedBox(height: 25),
+            Align(
+              alignment: AlignmentGeometry.topLeft,
+              child: Text(
+                '     가격: ${config.priceFormatter.format(product!.basePrice)}',
+                style: config.rLabel,
+              ),
+            ),
           ],
         ),
       ),
