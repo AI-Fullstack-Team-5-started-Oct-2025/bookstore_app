@@ -24,6 +24,7 @@ class _SearchViewState extends State<SearchView> {
   Product? product;
   List<Product>? productSizes;
   ProductBase? productBase;
+  List<ProductBase>? productColors;
   ProductImage? productImage;
   Manufacturer? manufacturer;
 
@@ -148,39 +149,73 @@ class _SearchViewState extends State<SearchView> {
               alignment: Alignment.topLeft,
               child: Text('     사이즈', style: config.rLabel),
             ),
+            SizedBox(height: 25),
             Row(
               children: [
                 SizedBox(
-                  height: 50, // 높이 지정해야 가로 리스트가 보임
+                  height: 50,
                   child: SizedBox(
-                    height: 50,
-                    width: MediaQuery.sizeOf(context).width, // 또는 Expanded로 감싸기
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: productSizes?.length ?? 0,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
-                        final size = productSizes![index].size;
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.purple.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            size.toString(),
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        );
-                      },
+                    width: MediaQuery.sizeOf(context).width,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20), // ← 왼쪽 여백 추가!
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: productSizes?.length ?? 0,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (context, index) {
+                          final size = productSizes![index].size;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                size.toString(),
+                                style: config.rLabel,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
+            SizedBox(height: 25),
+            Align(
+              alignment: Alignment.topLeft,
+              child: Text('     색상', style: config.rLabel),
+            ),
+            SizedBox(height: 25),
+
+            // Wrap(
+            //   spacing: 12,
+            //   children: List.generate(colors.length, (index) {
+            //     return ChoiceChip(
+            //       label: Text(colors[index]),
+            //       selected: _selectedColor == index,
+            //       onSelected: (bool selected) {
+            //         setState(() {
+            //           _selectedColor = index;
+            //         });
+            //       },
+            //       selectedColor: Colors.deepPurple.shade100,
+            //       backgroundColor: Colors.grey.shade200,
+            //       labelStyle: TextStyle(
+            //         color: _selectedColor == index
+            //             ? Colors.black
+            //             : Colors.grey.shade600,
+            //       ),
+            //     );
+            //   }),
+            // ),
           ],
         ),
       ),
