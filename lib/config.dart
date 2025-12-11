@@ -21,8 +21,8 @@ const seedColorDefault = Colors.deepPurple;
 const defaultThemeMode = ThemeMode.system;
 
 //  Paths
-const String kImageAssetPath = 'assets/images/';
-const String kIconAssetPath = 'assets/icons/';
+const String kImageAssetPath = 'images/';
+const String kIconAssetPath = 'icons/';
 
 //  DB Dummies
 const int kDefaultUserId = -1;  //  UserID befor login
