@@ -1,14 +1,14 @@
 //  Customer Model
 /*
-  Create: 10/12/2025 12:11, Creator: Chansol, Park
+  Create: 12/11/2025 15:38, Creator: taekkwon, kim
   Update log: 
-    12/11/2025 10:53, 'remove nickname and imagePath', Creator: taekkwon, kim
+    12/11/2025 15:38, 'create Employee Model', Creator: taekkwon, kim
   Version: 1.0
   Dependency: SQFlite, Path, collection
-  Desc: Customer Model
+  Desc: Employee Model
 */
 
-class Customer {
+class Employee {
   // Properties
   int? id;
   final String email;
@@ -17,7 +17,7 @@ class Customer {
   final String password;
 
   // Constructor
-  Customer({
+  Employee({
     this.id,
     required this.email,
     required this.phoneNumber,
@@ -25,7 +25,7 @@ class Customer {
     required this.password,
   });
 
-  Customer.fromMap(Map<String, Object?> map)
+  Employee.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
       email = map['email'] as String,
       phoneNumber = map['phoneNumber'] as String,
