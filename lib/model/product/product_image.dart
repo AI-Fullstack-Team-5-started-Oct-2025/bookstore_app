@@ -18,7 +18,7 @@ class ProductImage {
   final String imagePath;
 
   // Constructor
-  ProductImage({this.id, this.pbid, required this.imagePath});
+  ProductImage({this.id, required this.pbid, required this.imagePath});
 
   ProductImage.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
