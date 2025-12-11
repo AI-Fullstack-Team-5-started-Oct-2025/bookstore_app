@@ -4,21 +4,22 @@ import 'package:bookstore_app/view/login.dart';
 import 'package:bookstore_app/view/search_view.dart';
 import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:bookstore_app/mv/oncrate.dart';
 
-final GoRouter router = GoRouter(
-  initialLocation: config.routeLogin,
-  routes: [
-    GoRoute(path: config.routeLogin, builder: (context, state) => SearchView()),
-    GoRoute(
-      path: config.routeSettings,
-      builder: (context, state) => SettingPage(),
-    ),
-  ],
-);
+// final GoRouter router = GoRouter(
+
+//   initialLocation: config.routeLogin,
+//   routes: [
+//     GoRoute(path: config.routeLogin, builder: (context, state) => SearchView()),
+//     GoRoute(
+//       path: config.routeSettings,
+//       builder: (context, state) => SettingPage(),
+//     ),
+//   ],
+// );
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -26,10 +27,6 @@ Future<void> main() async {
 
   final path = join(dbPath, '${config.kDBName}${config.kDBFileExt}');
   await deleteDatabase(path);
-
-  final String dbName = '${config.kDBName}${config.kDBFileExt}';
-  final int dVersion = config.kVersion;
-  await DBCreation.creation(dbName, dVersion);
 
   runApp(const MyApp());
 }
@@ -46,7 +43,7 @@ class _MyAppState extends State<MyApp> {
 
   Color _seedColor = Colors.deepPurple;
 
-  void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
+  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
     _seedColor = inputColorScheme;
     setState(() {});
@@ -54,9 +51,9 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return GetMaterialApp(
       title: 'Flutter Demo',
-      routerConfig: router,
+      // routerConfig: router,
       themeMode: _themeMode,
       theme: ThemeData(
         brightness: Brightness.light,
@@ -67,7 +64,10 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         colorSchemeSeed: _seedColor,
       ),
+      initialRoute: '/',
+      getPages: [GetPage(name: '/', page: () => LoginScreen(),)
 
+      ],
       debugShowCheckedModeBanner: false,
     );
   }
