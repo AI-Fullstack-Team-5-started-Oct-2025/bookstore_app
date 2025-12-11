@@ -20,8 +20,12 @@ class _SearchViewState extends State<SearchView> {
   late ProductBase dProductBase; //  Dummy ProductBase
   late ProductImage dProductImage; //  Dummy ProductImage
   late Manufacturer dManufacturer; //  Dummy Manufacturer
+
   Product? product;
   ProductBase? productBase;
+  ProductImage? productImage;
+  Manufacturer? manufacturer;
+  
   final String dbName = '${config.kDBName}${config.kDBFileExt}';
   final int dVersion = config.kVersion;
 
@@ -74,7 +78,7 @@ class _SearchViewState extends State<SearchView> {
     );
     dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
     dManufacturer = Manufacturer(mName: 'Nikke');
-    await manufacturerDAO.insertK(dManufacturer.toMap());
+    dManufacturer.id = await manufacturerDAO.insertK(dManufacturer.toMap());
     dProduct = Product(
       pbid: dProductBase.id,
       mfid: dManufacturer.id,
@@ -82,13 +86,38 @@ class _SearchViewState extends State<SearchView> {
       size: 250,
       basePrice: 10500,
     );
-    await productDAO.insertK(dProduct.toMap());
-    product = await productDAO.queryK({'id': 1});
-    productBase = await productbaseDAO.queryK({'id': product!.id});
+    dProduct.id = await productDAO.insertK(dProduct.toMap());
+    product = await productDAO.queryK({'id': dProduct.id});
+    productBase = await productbaseDAO.queryK({'id': product!.pbid});
+    productImage = await productImageDAO.queryK({'id': dProductImage.id});
+    manufacturer = await manufacturerDAO.queryK({'id': 1});
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text('${productBase!.pName}')));
+    if (productBase == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Loading...')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          '${productBase!.pName}',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Text('data')
+          ],
+        ),
+      ),
+    );
   }
 }
