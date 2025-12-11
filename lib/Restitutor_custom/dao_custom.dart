@@ -1,7 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:collection/collection.dart';
-//  import 'package:bookstore_app/config.dart' as config;
+ import 'package:bookstore_app/config.dart' as config;
 
 //  Custom DB DAO's
 /*
@@ -16,8 +16,8 @@ import 'package:collection/collection.dart';
 */
 
 //  Version, db preset
-//  dbName = config.kDBbName;
-//  dVersion = config.kVersion;
+final String dbName = '${config.kDBName}${config.kDBFileExt}';
+final int  dVersion = config.kVersion;
 
 //  AppDatabase onCreate
 class RDB {
@@ -26,7 +26,7 @@ class RDB {
   static Future<Database> instance(String dbName, int dVersion) async {
     if (_db != null) return _db!;
 
-    final path = join(await getDatabasesPath(), '$dbName.db');
+    final path = join(await getDatabasesPath(), dbName);
 
     _db = await openDatabase(path, version: dVersion);
     if (_db == null) {
