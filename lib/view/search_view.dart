@@ -104,6 +104,7 @@ class _SearchViewState extends State<SearchView> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text(
           productBase!.pName,
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
@@ -114,18 +115,30 @@ class _SearchViewState extends State<SearchView> {
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
+            Center(
 
-            SizedBox(
-              height: 300,
-              width: MediaQuery.sizeOf(context).width,
               child: Image.asset(
                 productImage!.imagePath,
-                width: MediaQuery.sizeOf(context).width,
-                height: 150,
+                width: MediaQuery.sizeOf(context).width * 0.9,
+                height: 280,
               ),
             ),
-            Text('\n\n\n\n'),
-            Text('data'),
+            SizedBox(height: 40),
+            Align(
+              alignment: AlignmentGeometry.topLeft,
+              child: Text(
+                '     상품명: ${productBase!.pName}',
+                style: config.rLabel,
+              ),
+            ),
+            SizedBox(height: 25),
+            Align(
+              alignment: AlignmentGeometry.topLeft,
+              child: Text(
+                '     가격: ${config.priceFormatter.format(product!.basePrice)}',
+                style: config.rLabel,
+              ),
+            ),
           ],
         ),
       ),
