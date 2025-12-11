@@ -1,4 +1,5 @@
 import 'package:bookstore_app/config.dart' as config;
+import 'package:bookstore_app/view/cheng/login_screen.dart';
 import 'package:bookstore_app/view/login.dart';
 import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ final GoRouter router = GoRouter(
 
   initialLocation: config.routeLogin,
   routes: [
-    GoRoute(path: config.routeLogin, builder: (context, state) => Login()),
+    GoRoute(path: config.routeLogin, builder: (context, state) => LoginScreen()),
     GoRoute(
       path: config.routeSettings,
       builder: (context, state) => SettingPage(),
@@ -40,7 +41,7 @@ class _MyAppState extends State<MyApp> {
 
   Color _seedColor = Colors.deepPurple;
 
-  void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
+  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
     _seedColor = inputColorScheme;
     setState(() {});
@@ -61,6 +62,8 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.dark,
         colorSchemeSeed: _seedColor,
       ),
+
+      debugShowCheckedModeBanner: false,
     );
   }
 }

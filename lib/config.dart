@@ -48,7 +48,7 @@ const bool kUseLocalDBOnly = true;
 
 //  Tables
 const String kTableCustomer = 'Customer';
-const String kTableImage = 'Image';
+const String kTableProductImage = 'ProductImage';
 const String kTableProductBase = 'ProductBase';
 const String kTableManufacturer = 'Manufacturer';
 const String kTableProduct = 'Product';
