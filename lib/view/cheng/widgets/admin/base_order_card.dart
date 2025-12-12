@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../custom/custom.dart';
+import '../../custom/custom.dart';
 
 /// 주문 카드 기본 위젯
 /// 주문 관리와 반품 관리 화면에서 공통으로 사용하는 카드 구조를 제공하는 베이스 클래스입니다.

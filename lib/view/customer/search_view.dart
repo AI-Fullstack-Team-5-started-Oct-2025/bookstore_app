@@ -1,4 +1,3 @@
-import 'package:bookstore_app/config.dart' as config;
 import 'package:flutter/material.dart';
 
 //  SearchView page

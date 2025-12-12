@@ -1,11 +1,16 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import 'custom/custom.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
 
 // 관리자 모바일 접근 차단 안내 화면
 
-class AdminMobileBlockScreen extends StatelessWidget {
-  const AdminMobileBlockScreen({super.key});
+class AdminMobileBlockView extends StatelessWidget {
+  const AdminMobileBlockView({super.key});
 
   @override
   Widget build(BuildContext context) {

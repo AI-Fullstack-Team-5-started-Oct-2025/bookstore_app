@@ -4,7 +4,6 @@ import 'package:bookstore_app/model/product/manufacturer.dart';
 import 'package:bookstore_app/model/product/product.dart';
 import 'package:bookstore_app/model/product/product_base.dart';
 import 'package:bookstore_app/model/product/product_image.dart';
-import 'package:bookstore_app/model/sale/purchase.dart';
 import 'package:bookstore_app/config.dart' as config;
 
 class DataSet {

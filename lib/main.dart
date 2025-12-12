@@ -1,19 +1,20 @@
 import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncreate.dart';
-import 'package:bookstore_app/view/cheng/login_screen.dart';
+
 import 'package:bookstore_app/view/customer/address_payment_view.dart';
 import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
 import 'package:bookstore_app/view/customer/purchase_view.dart';
 import 'package:bookstore_app/view/customer/search_view.dart';
-import 'package:bookstore_app/view/login.dart';
-import 'package:bookstore_app/view/settings.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
+import 'view/cheng/screens/auth/login_view.dart';
 
 // final GoRouter router = GoRouter(
 
@@ -80,7 +81,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       getPages: [
-        GetPage(name: '/', page: () => LoginScreen(),),
+        GetPage(name: '/', page: () => LoginView(),),
         GetPage(name: '/cart', page: () => Cart(),),
         GetPage(name: '/searchview', page: () => SearchView(),),
         GetPage(name: '/detailview', page: () => DetailView(),),

@@ -1,20 +1,30 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
+
+// Local imports - Core
+import '../../../Restitutor_custom/dao_custom.dart';
+import '../../../config.dart' as config;
+import '../../../model/customer.dart';
+import '../../../model/login_history.dart';
+
+// Local imports - Custom widgets & utilities
 import 'custom/custom.dart';
-import 'login_screen.dart';
-import 'signup_screen.dart';
-import 'admin_mobile_block_screen.dart';
-import 'admin_login.dart';
-import 'admin_employee_order_view.dart';
-import 'admin_employee_return_order_view.dart';
-import 'user_profile_edit.dart';
-import 'order_list_screen.dart';
-import 'return_list_screen.dart';
-import '../../Restitutor_custom/dao_custom.dart';
-import '../../view/customer/search_view.dart';
-import '../../model/customer.dart';
-import '../../model/login_history.dart';
-import '../../config.dart' as config;
+import 'custom/util/log/custom_log_util.dart';
+
+// Local imports - Screens
+import 'screens/customer/search_view.dart';
+import 'screens/admin/admin_order_view.dart';
+import 'screens/admin/admin_return_order_view.dart';
+import 'screens/auth/admin_login_view.dart';
+import 'screens/admin/admin_mobile_block_view.dart';
+import 'screens/auth/login_view.dart';
+import 'screens/customer/order_list_view.dart';
+import 'screens/customer/return_list_view.dart';
+import 'screens/auth/signup_view.dart';
+import 'screens/customer/user_profile_edit_view.dart';
 
 // 네비게이션 테스트 페이지
 
@@ -165,12 +175,12 @@ class TestNavigationPage extends StatelessWidget {
 
   // 로그인 화면으로 이동
   void _navigateToLogin(BuildContext context) {
-    Get.to(() => const LoginScreen());
+    Get.to(() => const LoginView());
   }
 
   /// 회원가입 화면으로 이동
   void _navigateToSignUp(BuildContext context) {
-    Get.to(() => const SignUpScreen());
+    Get.to(() => const SignUpView());
   }
 
   /// 회원가입 화면으로 이동 (더미 데이터 포함)
@@ -191,42 +201,42 @@ class TestNavigationPage extends StatelessWidget {
     };
 
     // 더미 데이터와 함께 회원가입 화면으로 이동
-    Get.to(() => SignUpScreen(testData: testData));
+    Get.to(() => SignUpView(testData: testData));
   }
 
   /// 사용자 프로필 수정 화면으로 이동
   void _navigateToUserProfileEdit(BuildContext context) {
-    Get.to(() => const UserProfileEditScreen());
+    Get.to(() => const UserProfileEditView());
   }
 
   // 관리자 로그인 화면으로 이동
   void _navigateToAdminLogin(BuildContext context) {
-    Get.to(() => const AdminLoginScreen());
+    Get.to(() => const AdminLoginView());
   }
 
   // 관리자 모바일 차단 화면으로 이동
   void _navigateToAdminBlock(BuildContext context) {
-    Get.to(() => const AdminMobileBlockScreen());
+    Get.to(() => const AdminMobileBlockView());
   }
 
   // 주문 관리 화면으로 이동
   void _navigateToOrderView(BuildContext context) {
-    Get.to(() => const AdministerEmployeeOrderView());
+    Get.to(() => const AdminOrderView());
   }
 
   // 반품 관리 화면으로 이동
   void _navigateToReturnOrderView(BuildContext context) {
-    Get.to(() => const AdministerEmployeeReturnOrderView());
+    Get.to(() => const AdminReturnOrderView());
   }
 
   // 고객용 주문 목록 화면으로 이동
   void _navigateToCustomerOrderList(BuildContext context) {
-    Get.to(() => const OrderListScreen());
+    Get.to(() => const OrderListView());
   }
 
   // 고객용 반품 목록 화면으로 이동
   void _navigateToCustomerReturnList(BuildContext context) {
-    Get.to(() => const ReturnListScreen());
+    Get.to(() => const ReturnListView());
   }
 
   // 검색 화면으로 이동
@@ -303,6 +313,7 @@ class TestNavigationPage extends StatelessWidget {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e, stackTrace) {
+      AppLogger.e('사용자 정보 조회 에러', tag: 'TestNavigation', error: e, stackTrace: stackTrace);
       print('error: $e');
       print('stackTrace: $stackTrace');
       print('---------------');
@@ -390,6 +401,7 @@ class TestNavigationPage extends StatelessWidget {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e, stackTrace) {
+      AppLogger.e('로그인 히스토리 조회 에러', tag: 'TestNavigation', error: e, stackTrace: stackTrace);
       print('error: $e');
       print('stackTrace: $stackTrace');
       print('---------------');

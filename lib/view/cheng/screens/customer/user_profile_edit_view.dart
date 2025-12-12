@@ -1,28 +1,35 @@
+// Flutter imports
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../../Restitutor_custom/dao_custom.dart';
-import '../../config.dart' as config;
-import '../../model/employee.dart';
-import 'custom/custom.dart';
-import 'package:bookstore_app/db_setting.dart';
-import 'employee_sub_dir/admin_storage.dart';
-import 'employee_sub_dir/admin_tablet_utils.dart';
-import 'admin_mobile_block_screen.dart';
 
-/// 관리자 개인정보 수정 화면
-/// 관리자가 자신의 개인정보를 수정할 수 있는 화면입니다.
+// Third-party package imports
+import 'package:get/get.dart';
+
+// Local imports - Core
+import '../../../../Restitutor_custom/dao_custom.dart';
+import '../../../../config.dart' as config;
+import '../../../../model/customer.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+import '../../custom/util/log/custom_log_util.dart';
+
+// Local imports - Sub directories
+import '../../storage/user_storage.dart';
+
+/// 사용자 개인정보 수정 화면
+/// 사용자가 자신의 개인정보를 수정할 수 있는 화면입니다.
 /// 이메일은 아이디 역할을 하므로 수정할 수 없습니다.
 
-class AdminProfileEditScreen extends StatefulWidget {
-  const AdminProfileEditScreen({super.key});
+class UserProfileEditView extends StatefulWidget {
+  const UserProfileEditView({super.key});
 
   @override
-  State<AdminProfileEditScreen> createState() => _AdminProfileEditScreenState();
+  State<UserProfileEditView> createState() => _UserProfileEditViewState();
 }
 
-class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
+class _UserProfileEditViewState extends State<UserProfileEditView> {
   /// Form 검증을 위한 키
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(debugLabel: 'UserProfileEditForm');
 
   /// 이름 입력 컨트롤러
   final TextEditingController _nameController = TextEditingController();
@@ -36,13 +43,11 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
   /// 비밀번호 확인 입력 컨트롤러
   final TextEditingController _passwordConfirmController = TextEditingController();
 
-  /// 데이터베이스 설정 객체 (initState에서 초기화)
-  late final DbSetting dbSetting;
-  /// 직원 데이터 접근 객체 (initState에서 초기화)
-  late final RDAO<Employee> employeeDAO;
+  /// 고객 데이터 접근 객체 (initState에서 초기화)
+  late final RDAO<Customer> customerDAO;
 
-  /// 현재 관리자 정보 (get_storage에서 가져온 데이터)
-  Employee? _currentAdmin;
+  /// 현재 사용자 정보 (get_storage에서 가져온 데이터)
+  Customer? _currentCustomer;
 
   /// 이메일 (수정 불가, 읽기 전용)
   String _email = '';
@@ -51,29 +56,17 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
   void initState() {
     super.initState();
 
-    // 상태 관리 변수 초기화
-    dbSetting = DbSetting();
-    employeeDAO = RDAO<Employee>(
+    customerDAO = RDAO<Customer>(
       dbName: dbName,
-      tableName: config.tTableEmployee,
+      tableName: config.kTableCustomer,
       dVersion: dVersion,
-      fromMap: Employee.fromMap,
+      fromMap: Customer.fromMap,
     );
 
     // DB 초기화는 main.dart에서 이미 수행되므로 여기서는 호출하지 않습니다.
 
-    // get_storage에서 관리자 정보 가져오기
-    _loadAdminData();
-
-    // 태블릿이 아니면 모바일 차단 화면으로 이동
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!isTablet(context)) {
-        Get.off(() => const AdminMobileBlockScreen());
-      } else {
-        // 태블릿이면 가로 모드로 고정
-        lockTabletLandscape(context);
-      }
-    });
+    // get_storage에서 사용자 정보 가져오기
+    _loadUserData();
   }
 
   @override
@@ -82,28 +75,53 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
     _phoneController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
-    // 페이지 나갈 때 모든 방향 허용으로 복구
-    unlockAllOrientations();
     super.dispose();
   }
 
-  /// get_storage에서 관리자 정보를 가져와서 폼에 채우는 함수
-  void _loadAdminData() {
-    final admin = AdminStorage.getAdmin();
-    if (admin != null) {
-      setState(() {
-        _currentAdmin = admin;
-        _email = admin.eEmail;
-        _nameController.text = admin.eName;
-        _phoneController.text = admin.ePhoneNumber;
-        // 비밀번호는 저장하지 않으므로 비워둠
+  /// get_storage에서 사용자 정보를 가져와서 폼에 채우는 함수
+  void _loadUserData() {
+    final customer = UserStorage.getUser();
+
+    if (customer != null) {
+      // DB에서 최신 정보 가져오기
+      customerDAO.queryK({'cEmail': customer.cEmail}).then((customers) {
+        if (customers.isNotEmpty) {
+          final latestCustomer = customers.first;
+          setState(() {
+            _currentCustomer = latestCustomer;
+            _email = latestCustomer.cEmail;
+            _nameController.text = latestCustomer.cName;
+            _phoneController.text = latestCustomer.cPhoneNumber;
+            // 비밀번호는 저장하지 않으므로 비워둠
+          });
+        } else {
+          // DB에 사용자가 없으면 이전 페이지로 돌아가기
+          Get.back();
+          Get.snackbar(
+            '오류',
+            '사용자 정보를 찾을 수 없습니다.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red.shade100,
+            colorText: Colors.red.shade900,
+          );
+        }
+      }).catchError((error) {
+        AppLogger.e('사용자 정보 로드 에러', tag: 'UserProfileEdit', error: error);
+        Get.back();
+        Get.snackbar(
+          '오류',
+          '사용자 정보를 불러오는 중 오류가 발생했습니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.shade100,
+          colorText: Colors.red.shade900,
+        );
       });
     } else {
-      // 관리자 정보가 없으면 이전 페이지로 돌아가기
+      // 저장된 정보가 없으면 이전 페이지로 돌아가기
       Get.back();
       Get.snackbar(
         '오류',
-        '관리자 정보를 찾을 수 없습니다.',
+        '로그인 정보를 찾을 수 없습니다.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade100,
         colorText: Colors.red.shade900,
@@ -118,10 +136,13 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
       onTap: _unfocusKeyboard,
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
+        backgroundColor: const Color(0xFFD9D9D9),
         appBar: CustomAppBar(
           title: '개인정보 수정',
           centerTitle: true,
-          toolbarHeight: 48,
+          titleTextStyle: config.rLabel,
+          backgroundColor: const Color(0xFFD9D9D9),
+          foregroundColor: Colors.black,
         ),
         body: SafeArea(
           child: Center(
@@ -129,7 +150,7 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
                 child: CustomPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 32),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
                   child: Form(
                     key: _formKey,
                     child: CustomColumn(
@@ -282,36 +303,28 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
       confirmText: '확인',
       cancelText: '취소',
       borderRadius: 12,
-      autoDismissOnConfirm: false, // 수동으로 다이얼로그 닫기
+      autoDismissOnConfirm: false,
       onConfirm: () async {
-        print('다이얼로그 확인 버튼 클릭됨');
-        // 확인 버튼 클릭 시 실제 업데이트 수행
         try {
           final success = await _performUpdate();
-          print('업데이트 결과: $success');
           if (success) {
-            // 성공 시 다이얼로그 닫기
             if (context.mounted) {
-              Navigator.of(context).pop(); // 다이얼로그 닫기
+              Navigator.of(context).pop();
             }
-            // 다이얼로그가 닫힌 후 원래 페이지로 이동 (성공 결과 반환)
             Future.delayed(const Duration(milliseconds: 100), () {
               if (scaffoldContext.mounted) {
-                Navigator.of(scaffoldContext).pop(true); // 이전 페이지로 이동하고 성공 결과 반환
+                Navigator.of(scaffoldContext).pop(true);
               }
             });
           } else {
-            // 실패 시 다이얼로그만 닫기 (현재 페이지 유지)
             if (context.mounted) {
-              Navigator.of(context).pop(); // 다이얼로그 닫기
+              Navigator.of(context).pop();
             }
           }
         } catch (e, stackTrace) {
-          print('업데이트 중 예외 발생: $e');
-          print('스택 트레이스: $stackTrace');
-          // 에러 발생 시 다이얼로그 닫기
+          AppLogger.e('업데이트 중 예외 발생', tag: 'UserProfileEdit', error: e, stackTrace: stackTrace);
           if (context.mounted) {
-            Navigator.of(context).pop(); // 다이얼로그 닫기
+            Navigator.of(context).pop();
           }
           CustomSnackBar.showError(scaffoldContext, message: '업데이트 중 오류가 발생했습니다: $e');
         }
@@ -326,11 +339,9 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
   /// DB와 get_storage를 업데이트합니다.
   /// 반환값: 성공 시 true, 실패 시 false
   Future<bool> _performUpdate() async {
-    print('_performUpdate 시작');
-    
-    if (_currentAdmin == null) {
-      print('관리자 정보가 null입니다');
-      CustomSnackBar.showError(context, message: '관리자 정보를 찾을 수 없습니다');
+    if (_currentCustomer == null) {
+      AppLogger.e('사용자 정보가 null입니다', tag: 'UserProfileEdit');
+      CustomSnackBar.showError(context, message: '사용자 정보를 찾을 수 없습니다');
       return false;
     }
 
@@ -338,41 +349,32 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
     final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
 
-    print('업데이트할 데이터 - 이름: $name, 전화번호: $phone, 비밀번호 변경: ${password.isNotEmpty}');
-
-    // 업데이트할 데이터 준비
     final updateData = <String, Object?>{
-      'eName': name,
-      'ePhoneNumber': phone,
+      'cName': name,
+      'cPhoneNumber': phone,
     };
 
-    // 비밀번호가 입력되었으면 비밀번호도 업데이트
     if (password.isNotEmpty) {
-      updateData['ePassword'] = password;
+      updateData['cPassword'] = password;
     }
 
     try {
-      print('DB 업데이트 시작 - 이메일: $_email');
-      // DB 업데이트 (이메일을 키로 사용)
-      final updateResult = await employeeDAO.updateK(
+      await customerDAO.updateK(
         updateData,
-        {'eEmail': _email},
+        {'cEmail': _email},
       );
-      print('DB 업데이트 결과: $updateResult');
 
-      // get_storage 업데이트
-      final updatedEmployee = Employee(
-        id: _currentAdmin!.id,
-        eEmail: _email,
-        ePhoneNumber: phone,
-        eName: name,
-        ePassword: password.isNotEmpty ? password : _currentAdmin!.ePassword,
-        eRole: _currentAdmin!.eRole,
+      final updatedCustomer = Customer(
+        id: _currentCustomer!.id,
+        cEmail: _email,
+        cPhoneNumber: phone,
+        cName: name,
+        cPassword: password.isNotEmpty ? password : _currentCustomer!.cPassword,
       );
-      AdminStorage.saveAdmin(updatedEmployee);
-      print('get_storage 업데이트 완료');
+      UserStorage.saveUser(updatedCustomer);
+      
+      AppLogger.d('사용자 개인정보 수정 완료', tag: 'UserProfileEdit');
 
-      // 성공 메시지 표시
       Get.snackbar(
         '수정 완료',
         '개인정보가 수정되었습니다.',
@@ -381,15 +383,10 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
         colorText: Colors.green.shade900,
       );
 
-      // 성공 반환
-      print('_performUpdate 성공');
       return true;
     } catch (e, stackTrace) {
-      // 에러 처리
-      print('개인정보 수정 에러: $e');
-      print('스택 트레이스: $stackTrace');
+      AppLogger.e('개인정보 수정 에러', tag: 'UserProfileEdit', error: e, stackTrace: stackTrace);
       CustomSnackBar.showError(context, message: '개인정보 수정 중 오류가 발생했습니다: $e');
-      // 실패 반환
       return false;
     }
   }

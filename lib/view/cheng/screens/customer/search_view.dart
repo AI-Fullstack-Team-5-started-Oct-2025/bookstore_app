@@ -1,11 +1,19 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import 'customer_sub_dir/user_storage.dart';
-import 'user_profile_edit.dart';
-import 'order_list_screen.dart';
-import 'return_list_screen.dart';
-import '../customer/address_payment_view.dart';
-import 'login_screen.dart';
+
+// Local imports - Storage
+import '../../storage/user_storage.dart';
+
+// Local imports - Screens
+import '../../test_navigation_page.dart';
+import 'user_profile_edit_view.dart';
+import 'order_list_view.dart';
+import 'return_list_view.dart';
+import '../../../customer/address_payment_view.dart';
+import '../auth/login_view.dart';
 
 //  SearchView page
 /*
@@ -241,7 +249,7 @@ class _SearchViewState extends State<SearchView> {
             onTap: () async {
               Navigator.of(context).pop(); // 드로워 닫기
               // 개인정보 수정 페이지로 이동하고 결과를 받아서 사용자 정보 갱신
-              final result = await Get.to(() => const UserProfileEditScreen());
+              final result = await Get.to(() => const UserProfileEditView());
               // 개인정보 수정이 완료되면 사용자 정보를 다시 로드하여 drawer 갱신
               if (result == true) {
                 _loadUserInfo();
@@ -256,7 +264,7 @@ class _SearchViewState extends State<SearchView> {
             title: const Text('주문 내역'),
             onTap: () {
               Navigator.of(context).pop(); // 드로워 닫기
-              Get.to(() => const OrderListScreen());
+              Get.to(() => const OrderListView());
             },
           ),
           ListTile(
@@ -264,11 +272,11 @@ class _SearchViewState extends State<SearchView> {
             title: const Text('수령 / 반품 내역'),
             onTap: () {
               Navigator.of(context).pop(); // 드로워 닫기
-              Get.to(() => const ReturnListScreen());
+              Get.to(() => const ReturnListView());
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
+            leading: const Icon(Icons.add_box),
             title: const Text('배송지, 결제 방법 수정'),
             onTap: () {
               Navigator.of(context).pop(); // 드로워 닫기
@@ -295,7 +303,7 @@ class _SearchViewState extends State<SearchView> {
                         // 사용자 정보 삭제
                         UserStorage.clearUser();
                         // 로그인 화면으로 이동 (모든 페이지 제거)
-                        Get.offAll(() => const LoginScreen());
+                        Get.offAll(() => const LoginView());
                       },
                       child: const Text('로그아웃'),
                     ),
@@ -304,11 +312,30 @@ class _SearchViewState extends State<SearchView> {
               );
             },
           ),
+        
+          ListTile(
+            leading: const Icon(Icons.add_box),
+            title: const Text('테스트 페이지로 이동'),
+            onTap: () {
+              Navigator.of(context).pop(); // 드로워 닫기
+              Get.to(() => const TestNavigationPage());
+            },
+          ),
         ],
       ),
     );
   }
 }
+
+/*
+// 테스트 페이지로 이동 버튼 (임시)
+                      CustomButton(
+                        btnText: '테스트 페이지로 이동',
+                        buttonType: ButtonType.outlined,
+                        onCallBack: _navigateToTestPage,
+                        minimumSize: const Size(double.infinity, 56),
+                      ),
+*/
 
 class _ProductCard extends StatelessWidget {
   final Product product;
