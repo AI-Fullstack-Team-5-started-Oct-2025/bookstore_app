@@ -4,6 +4,7 @@
   Update log: 
     12/11/2025 10:53, 'remove nickname and imagePath', Creator: 
     12/11/2025 10:53, 'add Function toMap', Creator: taekkwon, kim
+    12/12/2025 10:53, 'rename cPname to cName', Creator: cheng, kim
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: Customer Model
@@ -14,7 +15,7 @@ class Customer {
   int? id;
   final String cEmail;
   final String cPhoneNumber;
-  final String cPname;
+  final String cName;
   final String cPassword;
 
   // Constructor
@@ -22,7 +23,7 @@ class Customer {
     this.id,
     required this.cEmail,
     required this.cPhoneNumber,
-    required this.cPname,
+    required this.cName,
     required this.cPassword,
   });
 
@@ -30,14 +31,14 @@ class Customer {
     : id = map['id'] as int?,
       cEmail = map['cEmail'] as String,
       cPhoneNumber = map['cPhoneNumber'] as String,
-      cPname = map['cPname'] as String,
+      cName = map['cName'] as String,
       cPassword = map['cPassword'] as String;
 
   Map<String, Object?> toMap({bool includeId = false}) {
     final map = <String, Object?>{
       'cEmail': cEmail,
       'cPhoneNumber': cPhoneNumber,
-      'cPname': cPname,
+      'cName': cName,
       'cPassword': cPassword,
     };
 
@@ -52,7 +53,7 @@ class Customer {
     'id',
     'cEmail',
     'cPhoneNumber',
-    'cPname',
+    'cName',
     'cPassword',
   ];
 }

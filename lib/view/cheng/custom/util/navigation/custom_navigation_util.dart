@@ -68,11 +68,14 @@ class _NoSwipeBackPageRoute<T> extends PageRouteBuilder<T> {
                // 페이드 애니메이션
                return FadeTransition(opacity: animation, child: child);
              case PageTransitionType.none:
-               // 애니메이션 없음
+               // 애니메이션 없음 - animation을 무시하고 항상 완료된 상태로 표시
                return child;
            }
          },
          transitionDuration: transitionType == PageTransitionType.none
+             ? Duration.zero
+             : const Duration(milliseconds: 300),
+         reverseTransitionDuration: transitionType == PageTransitionType.none
              ? Duration.zero
              : const Duration(milliseconds: 300),
        );
@@ -215,7 +218,18 @@ class CustomNavigationUtil {
     bool enableSwipeBack = false,
     PageTransitionType transitionType = PageTransitionType.slide,
   }) {
-    if (enableSwipeBack) {
+    if (transitionType == PageTransitionType.none) {
+      // 애니메이션 없이 즉시 전환
+      return Navigator.pushReplacement<T, void>(
+        context,
+        PageRouteBuilder<T>(
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+          settings: settings,
+        ),
+      );
+    } else if (enableSwipeBack) {
       return Navigator.pushReplacement<T, void>(
         context,
         MaterialPageRoute<T>(builder: (context) => page, settings: settings),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'custom/custom.dart';
 
 // 관리자 모바일 접근 차단 안내 화면
@@ -32,7 +33,7 @@ class AdminMobileBlockScreen extends StatelessWidget {
                 CustomCard(
                   child: CustomColumn(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    spacing: 10,
+                    spacing: 8, // spacing으로 통일하여 SizedBox 제거
                     children: [
                       CustomText(
                         '모바일 접근 제한',
@@ -40,18 +41,12 @@ class AdminMobileBlockScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         textAlign: TextAlign.center,
                       ),
-
-                      const SizedBox(height: 8),
-
                       CustomText(
                         '관리자 기능은 태블릿에서만 사용 가능합니다.',
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
                         textAlign: TextAlign.center,
                       ),
-
-                      const SizedBox(height: 4),
-
                       CustomText(
                         '관리자 계정으로 로그인하시려면 태블릿 기기에서 접속해주세요.',
                         fontSize: 14,
@@ -92,8 +87,6 @@ class AdminMobileBlockScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 12),
-
                 // 확인 버튼
                 CustomButton(
                   btnText: '확인',
@@ -114,7 +107,7 @@ class AdminMobileBlockScreen extends StatelessWidget {
   // 확인 버튼 클릭 처리
   void _handleConfirm(BuildContext context) {
     // TODO: 앱 종료 또는 이전 화면으로 이동
-    Navigator.of(context).pop();
+    Get.back();
   }
 
   //----Function End----
