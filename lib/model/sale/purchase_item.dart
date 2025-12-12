@@ -5,7 +5,8 @@
     DUMMY 9/29/2025 09:53, 'Point X, Description', Creator: Chansol, Park
     12/12/2025 14:27, 'Point 1, Removed quantity', Creator: Chansol, Park
     12/12/2025 14:27, 'Point 2, Purchase item Quantity, rebuild attributes, toMap', Creator: Chansol, Park
-    12/12/2025 15:26, 'Point 3, Purchase item Status, toMap', Creator: Chansol, Park
+    12/12/2025 15:26, 'Point 3, Purchase item Status', Creator: Chansol, Park
+    12/12/2025 16:40, 'Point 4, Purchase item uid', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: PurchaseItem Model
@@ -18,7 +19,9 @@ class PurchaseItem {
   //  Properties
   //  Point 1
   int? id;
-  int? pid; //  Product id
+  int pid; //  Product id
+  //  Point 4
+  int uid; //  Customer id
   //  Point 2
   int pcQuantity; //  Purchase Item Quantity
   String pcStatus;  //  'Onway', 'Waiting for transaction', 'complete', 'return request', 'return done'
@@ -28,14 +31,16 @@ class PurchaseItem {
   // Constructor
   PurchaseItem({
     this.id,
-    this.pid,
+    required this.pid,
+    required this.uid,
     required this.pcQuantity,
     required this.pcStatus  //  
   });
 
   PurchaseItem.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
-      pid = map['pid'] as int?,
+      pid = map['pid'] as int,
+      uid = map['uid'] as int,
       pcQuantity = map['pcQuantity'] as int,
       pcStatus = map['pcStatus'] as String;
 
@@ -43,7 +48,8 @@ class PurchaseItem {
   Map<String, Object?> toMap({bool includeId = false}) {
     final map = <String, Object?>{
       'pid': pid,
-      'asid': pcQuantity,
+      'uid': uid,
+      'pcQuantity': pcQuantity,
       'pcStatus': pcStatus
     };
 
@@ -54,5 +60,5 @@ class PurchaseItem {
     return map;
   }
 
-  static const List<String> keys = ['id', 'pid', 'pcQuantity', 'pcStatus'];
+  static const List<String> keys = ['id', 'pid', 'uid', 'pcQuantity', 'pcStatus'];
 }
