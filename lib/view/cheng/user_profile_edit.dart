@@ -354,7 +354,7 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
 
     // 업데이트할 데이터 준비
     final updateData = <String, Object?>{
-      'cPname': name,
+      'cName': name,
       'cPhoneNumber': phone,
     };
 
