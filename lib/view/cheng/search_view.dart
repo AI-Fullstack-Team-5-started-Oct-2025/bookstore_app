@@ -238,9 +238,17 @@ class _SearchViewState extends State<SearchView> {
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('프로필'),
-            onTap: () {
+            onTap: () async {
               Navigator.of(context).pop(); // 드로워 닫기
-              Get.to(() => const UserProfileEditScreen());
+              // 개인정보 수정 페이지로 이동하고 결과를 받아서 사용자 정보 갱신
+              final result = await Get.to(() => const UserProfileEditScreen());
+              // 개인정보 수정이 완료되면 사용자 정보를 다시 로드하여 drawer 갱신
+              if (result == true) {
+                _loadUserInfo();
+                setState(() {
+                  // drawer가 다시 빌드되도록 setState 호출
+                });
+              }
             },
           ),
           ListTile(

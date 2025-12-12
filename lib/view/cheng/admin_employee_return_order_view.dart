@@ -109,8 +109,11 @@ class _AdministerEmployeeReturnOrderViewState
           final result = await Get.to(() => const AdminProfileEditScreen());
           // 개인정보 수정이 완료되면 드로워를 갱신하기 위해 setState 호출
           if (result == true) {
+            print('[DEBUG] 관리자 개인정보 수정 완료 - drawer 갱신');
             setState(() {
               // AdminStorage에서 최신 정보를 다시 읽어서 드로워가 갱신되도록 함
+              // AdminDrawer는 userName과 userRole을 파라미터로 받으므로,
+              // setState로 build 메서드가 다시 실행되면 AdminStorage에서 최신 정보를 읽어옴
             });
           }
         },
