@@ -1,15 +1,16 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:collection/collection.dart';
- import 'package:bookstore_app/config.dart' as config;
+import 'package:bookstore_app/config.dart' as config;
 
-//  Custom DB DAO's
+//  Custom DB DAOs
 /*
   Create: 8/12/2025, Creator: Chansol, Park
   Update log: 
     9/29/2025 09:53, 'Point 1, CRUD table using keys', Creator: Chansol, Park
     9/29/2025 11:17, 'Delete OBSOLETE Functions', Creator: Chansol, Park
     9/29/2025 11:28, 'Point 2, Total class refactored by GPT', Creator: Chansol, Park
+    12/12/2025 17:08, 'Point 3, Created Insert multyple datas from multiple/single Table, TableBatch Class', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
@@ -17,7 +18,21 @@ import 'package:collection/collection.dart';
 
 //  Version, db preset
 final String dbName = '${config.kDBName}${config.kDBFileExt}';
-final int  dVersion = config.kVersion;
+final int dVersion = config.kVersion;
+
+//  Point 3
+//  single TableBatch
+class TableBatch {
+  final String tableName;
+  final List<Map<String, Object?>> rows;
+  TableBatch({required this.tableName, required this.rows});
+}
+//  multi TableBatch
+class MultiTableBatch {
+  final List<TableBatch> tables;
+
+  MultiTableBatch({required this.tables});
+}
 
 //  AppDatabase onCreate
 class RDB {
@@ -37,52 +52,28 @@ class RDB {
   }
 
   Future<void> validateTableColumns({
-  required Database db,
-  required String tableName,
-  //  ModelEx.keys on expectedColumns
-  required List<String> expectedColumns,
-}) async {
-  final result = await db.rawQuery('PRAGMA table_info($tableName)');
+    required Database db,
+    required String tableName,
+    //  ModelEx.keys on expectedColumns
+    required List<String> expectedColumns,
+  }) async {
+    final result = await db.rawQuery('PRAGMA table_info($tableName)');
 
-  final actualColumns = result.map((row) => row['name'] as String).toList();
+    final actualColumns = result.map((row) => row['name'] as String).toList();
 
-  actualColumns.sort();
-  final sortedExpected = [...expectedColumns]..sort();
+    actualColumns.sort();
+    final sortedExpected = [...expectedColumns]..sort();
 
-  if (actualColumns.length != sortedExpected.length ||
-      !ListEquality().equals(actualColumns, sortedExpected)) {
-    print('❌ SCHEMA MISMATCH for $tableName');
-    print('  Expected: $sortedExpected');
-    print('  Actual:   $actualColumns');
-    throw Exception('Schema mismatch for table $tableName');
-  } else {
-    print('✅ SCHEMA OK for $tableName: $actualColumns');
+    if (actualColumns.length != sortedExpected.length ||
+        !ListEquality().equals(actualColumns, sortedExpected)) {
+      print('❌ SCHEMA MISMATCH for $tableName');
+      print('  Expected: $sortedExpected');
+      print('  Actual:   $actualColumns');
+      throw Exception('Schema mismatch for table $tableName');
+    } else {
+      print('✅ SCHEMA OK for $tableName: $actualColumns');
+    }
   }
-}
-
-  // static Future<Database> creation(
-  //   String dbName,
-  //   int dVersion,
-  // ) async {
-  //   if (_db != null) return _db!;
-
-  //   final path = join(await getDatabasesPath(), '$dbName.db');
-
-  //   _db = await openDatabase(
-  //     path,
-  //     version: dVersion,
-  //     onCreate: (db, version) async {
-  //       await db.execute('''
-  //         create table tname (
-  //           id integer primary key autoincrement,
-  //           attribute_name generic
-  //         )
-  //       ''');
-  //     },
-  //   );
-
-  //   return _db!;
-  // }
 }
 
 class RDAO<T> {
@@ -105,7 +96,7 @@ class RDAO<T> {
     return results.map((e) => fromMap(e)).toList();
   }
 
-  //  DBHandler.queryK('Key': 1)
+  //  DBHandler.queryK({'Key': value})
   Future<List<T>> queryK(Map<String, Object?> keyList) async {
     if (keyList.isEmpty) {
       throw ArgumentError('keyList must NOT be empty');
@@ -124,25 +115,118 @@ class RDAO<T> {
 
   //  DBHandler.insertK(Tablename.toMap());
   Future<int> insertK(Map<String, Object?> data) async {
+    try {
+      final db = await RDB.instance(dbName, dVersion);
+
+      final keys = data.keys.join(', ');
+      final placeholders = List.filled(data.length, '?').join(', ');
+      final sql = 'INSERT INTO $tableName ($keys) VALUES ($placeholders)';
+
+      final result = await db.rawInsert(sql, data.values.toList());
+
+      // 성공 → rowId 반환 (rawInsert는 rowId를 반환)
+      return result;
+    } on DatabaseException catch (e) {
+      // SQLite 관련 에러
+      print('INSERT DB Error in $tableName → $e');
+      return -1; // 실패 시 구분 값
+    } catch (e) {
+      // 그 외 모든 오류
+      print('UNKNOWN INSERT Error in $tableName → $e');
+      return -1; // 실패 시 구분 값
+    }
+  }
+
+  //  Point 3
+  // DBHandler.insertBatch(singleTableBatch);
+  Future<List<int>> insertBatch(TableBatch batch) async {
+    final List<int> resultIds = [];
+
+    if (batch.rows.isEmpty) {
+      return resultIds;
+    }
+
+    try {
+      final db = await RDB.instance(dbName, dVersion);
+
+      await db.transaction((txn) async {
+        for (final data in batch.rows) {
+          if (data.isEmpty) {
+            continue;
+          }
+
+          final keys = data.keys.join(', ');
+          final placeholders = List.filled(data.length, '?').join(', ');
+          final sql =
+              'INSERT INTO ${batch.tableName} ($keys) VALUES ($placeholders)';
+
+          final rowId = await txn.rawInsert(sql, data.values.toList());
+          resultIds.add(rowId);
+        }
+      });
+
+      return resultIds;
+    } on DatabaseException catch (e) {
+      print('INSERT BATCH DB Error in ${batch.tableName} → $e');
+      return List.filled(batch.rows.length, -1);
+    } catch (e) {
+      print('UNKNOWN INSERT BATCH Error in ${batch.tableName} → $e');
+      return List.filled(batch.rows.length, -1);
+    }
+  }
+
+  //  DBHandler.insertMultiTableBatch(MultitableBatches)
+  Future<Map<String, List<int>>> insertMultiTableBatch(
+  MultiTableBatch batch,
+) async {
+  final Map<String, List<int>> resultIds = {};
+
+  if (batch.tables.isEmpty) {
+    return resultIds;
+  }
+
   try {
     final db = await RDB.instance(dbName, dVersion);
 
-    final keys = data.keys.join(', ');
-    final placeholders = List.filled(data.length, '?').join(', ');
-    final sql = 'INSERT INTO $tableName ($keys) VALUES ($placeholders)';
+    await db.transaction((txn) async {
+      for (final tableBatch in batch.tables) {
+        final String tName = tableBatch.tableName;
+        final List<Map<String, Object?>> rows = tableBatch.rows;
 
-    final result = await db.rawInsert(sql, data.values.toList());
+        if (rows.isEmpty) {
+          resultIds[tName] = [];
+          continue;
+        }
 
-    // 성공 → rowId 반환 (rawInsert는 rowId를 반환)
-    return result;
+        final List<int> rowIds = [];
+
+        for (final data in rows) {
+          if (data.isEmpty) {
+            continue;
+          }
+
+          final keys = data.keys.join(', ');
+          final placeholders =
+              List.filled(data.length, '?').join(', ');
+          final sql =
+              'INSERT INTO $tName ($keys) VALUES ($placeholders)';
+
+          final rowId =
+              await txn.rawInsert(sql, data.values.toList());
+          rowIds.add(rowId);
+        }
+
+        resultIds[tName] = rowIds;
+      }
+    });
+
+    return resultIds;
   } on DatabaseException catch (e) {
-    // SQLite 관련 에러
-    print('INSERT DB Error in $tableName → $e');
-    return -1; // 실패 시 구분 값
+    print('INSERT MULTI-TABLE DB Error → $e');
+    return {};
   } catch (e) {
-    // 그 외 모든 오류
-    print('UNKNOWN INSERT Error in $tableName → $e');
-    return -1; // 실패 시 구분 값
+    print('UNKNOWN MULTI-TABLE INSERT Error → $e');
+    return {};
   }
 }
 
