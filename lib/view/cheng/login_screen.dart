@@ -6,6 +6,7 @@ import '../../config.dart' as config;
 import '../../model/customer.dart';
 import '../../model/login_history.dart';
 import '../customer/search_view.dart';
+import 'search_view.dart' as cheng_search; // 임시: cheng 폴더의 search_view 사용
 import 'custom/custom.dart';
 import 'custom/custom_common_util.dart';
 
@@ -229,12 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _adminTapTimer?.cancel();
 
       // 태블릿 여부 확인
-      final size = MediaQuery.of(context).size;
-      final shortestSide = size.shortestSide;
       final isTabletDevice = isTablet(context);
-      
-      // 디버깅 정보 출력
-      print('태블릿 체크 - 화면 크기: ${size.width} x ${size.height}, shortestSide: $shortestSide, isTablet: $isTabletDevice');
       
       if (isTabletDevice) {
         // 태블릿이면 관리자 로그인 페이지로 이동
@@ -279,11 +275,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       customerDAO.queryK(queryMap).then((customers) async {
         if (customers.isNotEmpty) {
-          // ============================================================
           // 로그인 성공 처리
-          // ============================================================
           final customer = customers.first;
-          print('로그인 성공: ${customer.cName}');
           
           // 해당 고객의 로그인 히스토리 조회
           if (customer.id != null) {
@@ -308,8 +301,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     {'cid': customer.id},
                   );
                   
-                  print('로그인 히스토리 갱신 완료: Customer ID ${customer.id}, 시간: $currentTime');
-                  
                   // 사용자 정보를 get_storage에 저장
                   UserStorage.saveUser(customer);
                   
@@ -319,7 +310,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     snackPosition: SnackPosition.BOTTOM,
                   );
 
-                  Get.offAll(() => const SearchView());
+                  // TODO: 임시 - cheng 폴더의 search_view 사용 (나중에 원래대로 되돌릴 예정)
+                  Get.offAll(() => const cheng_search.SearchView());
+                  // 원래 코드 (되돌릴 때 사용):
+                  // Get.offAll(() => const SearchView());
                 } else if (currentStatus == config.loginStatus[1] as String) {
                   // 휴면 회원 (status 1) - 로그인 차단
                   CustomDialog.show(
@@ -340,7 +334,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 } else {
                   // 알 수 없는 상태
-                  print('알 수 없는 로그인 상태: $currentStatus');
                   Get.snackbar(
                     '오류',
                     '로그인 상태를 확인할 수 없습니다.',
@@ -348,173 +341,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     backgroundColor: Colors.red.shade100,
                     colorText: Colors.red.shade900,
                   );
+                  return;
                 }
               } else {
-                // queryK가 빈 리스트를 반환한 경우 (EMPTY 예외가 아닌 경우)
-                // 로그인 히스토리가 없으면 신규 인서트
-                print('로그인 히스토리를 찾을 수 없습니다: Customer ID ${customer.id}');
-                print('새로운 로그인 히스토리 생성 시작');
+                // 로그인 히스토리가 없으면 신규 생성
+                await _createLoginHistory(customer, loginHistoryDAO);
                 
-                // 현재 시간을 분까지 string으로 저장 (yyyy-MM-dd HH:mm 형식)
-                final currentTime = CustomCommonUtil.formatDate(
-                  DateTime.now(),
-                  'yyyy-MM-dd HH:mm',
-                );
-                
-                // LoginHistory 객체 생성
-                final newLoginHistory = LoginHistory(
-                  cid: customer.id, // 현재 로그인한 사용자의 ID
-                  loginTime: currentTime, // 현재 시간 (분까지)
-                  lStatus: config.loginStatus[0] as String, // '활동 회원'
-                  lVersion: 0.0, // 버전 (모델 타입상 double이지만, DB에는 빈 문자열로 저장)
-                  lAddress: '', // 저장하지 않음 (빈 문자열)
-                  lPaymentMethod: '', // 저장하지 않음 (빈 문자열)
-                );
-                
-                print('  - Customer ID (cid): ${customer.id}');
-                print('  - 로그인 시간 (loginTime): $currentTime');
-                print('  - 상태 (lStatus): ${config.loginStatus[0]}');
-                print('  - 버전 (lVersion): "" (빈 문자열로 저장)');
-                
-                try {
-                  // lVersion을 빈 문자열로 저장하기 위해 toMap() 후 수정
-                  final loginHistoryMap = newLoginHistory.toMap();
-                  loginHistoryMap['lVersion'] = ''; // 빈 문자열로 저장
-                  
-                  print('=== 신규 로그인 히스토리 인서트 데이터 ===');
-                  print('  - cid: ${loginHistoryMap['cid']}');
-                  print('  - loginTime: ${loginHistoryMap['loginTime']}');
-                  print('  - lStatus: ${loginHistoryMap['lStatus']}');
-                  print('  - lVersion: ${loginHistoryMap['lVersion']}');
-                  print('  - lAddress: ${loginHistoryMap['lAddress']}');
-                  print('  - lPaymentMethod: ${loginHistoryMap['lPaymentMethod']}');
-                  
-                  final loginHistoryId = await loginHistoryDAO.insertK(loginHistoryMap);
-                  
-                  print('로그인 히스토리 생성 완료: LoginHistory ID $loginHistoryId');
-                  
-                  // 저장된 값을 다시 조회하여 확인
-                  final insertedHistories = await loginHistoryDAO.queryK({'id': loginHistoryId});
-                  if (insertedHistories.isNotEmpty) {
-                    final inserted = insertedHistories.first;
-                    print('=== 저장된 로그인 히스토리 확인 ===');
-                    print('  - ID: ${inserted.id}');
-                    print('  - cid: ${inserted.cid}');
-                    print('  - loginTime: ${inserted.loginTime}');
-                    print('  - lStatus: ${inserted.lStatus}');
-                    print('  - lVersion: ${inserted.lVersion}');
-                    print('  - lAddress: ${inserted.lAddress}');
-                    print('  - lPaymentMethod: ${inserted.lPaymentMethod}');
-                  }
-                  
-                  // 사용자 정보를 get_storage에 저장
-                  UserStorage.saveUser(customer);
-                  
-                  Get.snackbar(
-                    '로그인 성공',
-                    '${customer.cName}님 환영합니다!',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-
-                  Get.offAll(() => const SearchView());
-                } catch (e) {
-                  // 로그인 히스토리 생성 실패 시에도 일반 로그인 처리
-                  print('로그인 히스토리 생성 실패: $e');
-                  UserStorage.saveUser(customer);
-                  
-                  Get.snackbar(
-                    '로그인 성공',
-                    '${customer.cName}님 환영합니다!',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-
-                  Get.offAll(() => const SearchView());
-                }
-              }
-            } catch (e) {
-              // EMPTY 예외는 로그인 히스토리가 없다는 의미이므로 신규 인서트
-              if (e.toString().contains('EMPTY')) {
-                print('로그인 히스토리가 없습니다 (EMPTY): Customer ID ${customer.id}');
-                print('새로운 로그인 히스토리 생성 시작');
-                
-                // 현재 시간을 분까지 string으로 저장 (yyyy-MM-dd HH:mm 형식)
-                final currentTime = CustomCommonUtil.formatDate(
-                  DateTime.now(),
-                  'yyyy-MM-dd HH:mm',
-                );
-                
-                // LoginHistory 객체 생성
-                final newLoginHistory = LoginHistory(
-                  cid: customer.id, // 현재 로그인한 사용자의 ID
-                  loginTime: currentTime, // 현재 시간 (분까지)
-                  lStatus: config.loginStatus[0] as String, // '활동 회원'
-                  lVersion: 0.0, // 버전 (모델 타입상 double이지만, DB에는 빈 문자열로 저장)
-                  lAddress: '', // 저장하지 않음 (빈 문자열)
-                  lPaymentMethod: '', // 저장하지 않음 (빈 문자열)
-                );
-                
-                print('  - Customer ID (cid): ${customer.id}');
-                print('  - 로그인 시간 (loginTime): $currentTime');
-                print('  - 상태 (lStatus): ${config.loginStatus[0]}');
-                print('  - 버전 (lVersion): "" (빈 문자열로 저장)');
-                
-                try {
-                  // lVersion을 빈 문자열로 저장하기 위해 toMap() 후 수정
-                  final loginHistoryMap = newLoginHistory.toMap();
-                  loginHistoryMap['lVersion'] = ''; // 빈 문자열로 저장
-                  
-                  print('=== 신규 로그인 히스토리 인서트 데이터 ===');
-                  print('  - cid: ${loginHistoryMap['cid']}');
-                  print('  - loginTime: ${loginHistoryMap['loginTime']}');
-                  print('  - lStatus: ${loginHistoryMap['lStatus']}');
-                  print('  - lVersion: ${loginHistoryMap['lVersion']}');
-                  print('  - lAddress: ${loginHistoryMap['lAddress']}');
-                  print('  - lPaymentMethod: ${loginHistoryMap['lPaymentMethod']}');
-                  
-                  final loginHistoryId = await loginHistoryDAO.insertK(loginHistoryMap);
-                  
-                  print('로그인 히스토리 생성 완료: LoginHistory ID $loginHistoryId');
-                  
-                  // 저장된 값을 다시 조회하여 확인
-                  final insertedHistories = await loginHistoryDAO.queryK({'id': loginHistoryId});
-                  if (insertedHistories.isNotEmpty) {
-                    final inserted = insertedHistories.first;
-                    print('=== 저장된 로그인 히스토리 확인 ===');
-                    print('  - ID: ${inserted.id}');
-                    print('  - cid: ${inserted.cid}');
-                    print('  - loginTime: ${inserted.loginTime}');
-                    print('  - lStatus: ${inserted.lStatus}');
-                    print('  - lVersion: ${inserted.lVersion}');
-                    print('  - lAddress: ${inserted.lAddress}');
-                    print('  - lPaymentMethod: ${inserted.lPaymentMethod}');
-                  }
-                  
-                  // 사용자 정보를 get_storage에 저장
-                  UserStorage.saveUser(customer);
-                  
-                  Get.snackbar(
-                    '로그인 성공',
-                    '${customer.cName}님 환영합니다!',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-
-                  Get.offAll(() => const SearchView());
-                } catch (insertError) {
-                  // 로그인 히스토리 생성 실패 시에도 일반 로그인 처리
-                  print('로그인 히스토리 생성 실패: $insertError');
-                  UserStorage.saveUser(customer);
-                  
-                  Get.snackbar(
-                    '로그인 성공',
-                    '${customer.cName}님 환영합니다!',
-                    snackPosition: SnackPosition.BOTTOM,
-                  );
-
-                  Get.offAll(() => const SearchView());
-                }
-              } else {
-                // EMPTY가 아닌 다른 에러인 경우
-                print('로그인 히스토리 조회 실패: $e');
+                // 사용자 정보를 get_storage에 저장
                 UserStorage.saveUser(customer);
                 
                 Get.snackbar(
@@ -523,12 +356,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   snackPosition: SnackPosition.BOTTOM,
                 );
 
-                Get.offAll(() => const SearchView());
+                // TODO: 임시 - cheng 폴더의 search_view 사용 (나중에 원래대로 되돌릴 예정)
+                Get.offAll(() => const cheng_search.SearchView());
+                // 원래 코드 (되돌릴 때 사용):
+                // Get.offAll(() => const SearchView());
               }
+            } catch (e) {
+              // EMPTY 예외는 로그인 히스토리가 없다는 의미이므로 신규 생성
+              if (e.toString().contains('EMPTY')) {
+                await _createLoginHistory(customer, loginHistoryDAO);
+              }
+              
+              // 사용자 정보를 get_storage에 저장
+              UserStorage.saveUser(customer);
+              
+              Get.snackbar(
+                '로그인 성공',
+                '${customer.cName}님 환영합니다!',
+                snackPosition: SnackPosition.BOTTOM,
+              );
+
+              Get.offAll(() => const SearchView());
             }
           } else {
-            // Customer ID가 없는 경우 (이론적으로 발생하지 않아야 함)
-            print('Customer ID가 없습니다.');
+            // Customer ID가 없는 경우
             Get.snackbar(
               '오류',
               '로그인 처리 중 오류가 발생했습니다.',
@@ -549,7 +400,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       }).catchError((error) {
         // 에러 처리
-        print('로그인 에러: $error');
         Get.snackbar(
           '오류',
           '로그인 중 오류가 발생했습니다.',
@@ -558,6 +408,33 @@ class _LoginScreenState extends State<LoginScreen> {
           colorText: Colors.red.shade900,
         );
       });
+    }
+  }
+
+  /// 로그인 히스토리 생성 (중복 코드 제거)
+  Future<void> _createLoginHistory(Customer customer, RDAO<LoginHistory> loginHistoryDAO) async {
+    try {
+      final currentTime = CustomCommonUtil.formatDate(
+        DateTime.now(),
+        'yyyy-MM-dd HH:mm',
+      );
+      
+      final double dVersion = config.kVersion.toDouble();
+      
+      final newLoginHistory = LoginHistory(
+        cid: customer.id,
+        loginTime: currentTime,
+        lStatus: config.loginStatus[0] as String,
+        lVersion: dVersion,
+        lAddress: '',
+        lPaymentMethod: '',
+      );
+      
+      final loginHistoryMap = newLoginHistory.toMap();
+      await loginHistoryDAO.insertK(loginHistoryMap);
+    } catch (e) {
+      // 로그인 히스토리 생성 실패는 로그인 성공에 영향을 주지 않음
+      // 에러는 무시하고 계속 진행
     }
   }
 
