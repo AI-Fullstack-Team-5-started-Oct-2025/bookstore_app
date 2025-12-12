@@ -5,7 +5,7 @@ import '../../config.dart' as config;
 import '../../model/customer.dart';
 import 'custom/custom.dart';
 import 'package:bookstore_app/db_setting.dart';
-import 'customer/user_storage.dart';
+import 'customer_sub_dir/user_storage.dart';
 
 /// 사용자 개인정보 수정 화면
 /// 사용자가 자신의 개인정보를 수정할 수 있는 화면입니다.

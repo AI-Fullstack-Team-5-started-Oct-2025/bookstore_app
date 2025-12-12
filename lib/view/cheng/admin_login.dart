@@ -6,8 +6,8 @@ import '../../model/employee.dart';
 import 'custom/custom.dart';
 import 'custom/custom_common_util.dart';
 import 'package:bookstore_app/db_setting.dart';
-import 'employee/admin_tablet_utils.dart';
-import 'employee/admin_storage.dart';
+import 'employee_sub_dir/admin_tablet_utils.dart';
+import 'employee_sub_dir/admin_storage.dart';
 import 'admin_employee_order_view.dart';
 import 'admin_mobile_block_screen.dart';
 
