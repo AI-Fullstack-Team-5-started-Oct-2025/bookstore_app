@@ -175,61 +175,6 @@ class RDAO<T> {
     }
   }
 
-  //  DBHandler.insertMultiTableBatch(MultitableBatches)
-  Future<Map<String, List<int>>> insertMultiTableBatch(
-  MultiTableBatch batch,
-) async {
-  final Map<String, List<int>> resultIds = {};
-
-  if (batch.tables.isEmpty) {
-    return resultIds;
-  }
-
-  try {
-    final db = await RDB.instance(dbName, dVersion);
-
-    await db.transaction((txn) async {
-      for (final tableBatch in batch.tables) {
-        final String tName = tableBatch.tableName;
-        final List<Map<String, Object?>> rows = tableBatch.rows;
-
-        if (rows.isEmpty) {
-          resultIds[tName] = [];
-          continue;
-        }
-
-        final List<int> rowIds = [];
-
-        for (final data in rows) {
-          if (data.isEmpty) {
-            continue;
-          }
-
-          final keys = data.keys.join(', ');
-          final placeholders =
-              List.filled(data.length, '?').join(', ');
-          final sql =
-              'INSERT INTO $tName ($keys) VALUES ($placeholders)';
-
-          final rowId =
-              await txn.rawInsert(sql, data.values.toList());
-          rowIds.add(rowId);
-        }
-
-        resultIds[tName] = rowIds;
-      }
-    });
-
-    return resultIds;
-  } on DatabaseException catch (e) {
-    print('INSERT MULTI-TABLE DB Error → $e');
-    return {};
-  } catch (e) {
-    print('UNKNOWN MULTI-TABLE INSERT Error → $e');
-    return {};
-  }
-}
-
   // DBHandler.updateK(Tablename.toMap(), KeyListTable.toMap())
   Future<int> updateK(
     Map<String, Object?> data,
