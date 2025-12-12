@@ -10,10 +10,10 @@ import 'custom/custom_common_util.dart';
 import 'signup_screen.dart';
 import 'admin_login.dart';
 import 'admin_mobile_block_screen.dart';
-import 'employee/admin_tablet_utils.dart';
+import 'employee_sub_dir/admin_tablet_utils.dart';
 import 'test_navigation_page.dart';
 import 'package:bookstore_app/db_setting.dart';
-import 'customer/user_storage.dart';
+import 'customer_sub_dir/user_storage.dart';
 // 로그인 화면
 
 class LoginScreen extends StatefulWidget {

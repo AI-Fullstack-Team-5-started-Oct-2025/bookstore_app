@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../custom/custom.dart';
-import 'customer_info_card.dart';
-import '../employee/order_utils.dart';
+import 'custom/custom.dart';
+import 'customer_sub_dir/customer_info_card.dart';
+import 'employee_sub_dir/order_utils.dart';
 
 /// 고객용 주문 상세 화면
 /// 모바일 세로 화면에 최적화된 주문 상세 정보 화면입니다.
@@ -150,7 +150,7 @@ class OrderDetailScreen extends StatelessWidget {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
 
                 // 총 가격 표시 카드
                 CustomCard(

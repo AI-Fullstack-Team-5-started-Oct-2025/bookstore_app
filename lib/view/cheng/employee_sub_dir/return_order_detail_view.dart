@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../custom/custom.dart';
-import '../customer/customer_info_card.dart';
+import '../customer_sub_dir/customer_info_card.dart';
 
 /// 반품 주문 상세 정보 뷰
 /// 반품 관리 화면의 우측에 표시되는 반품 주문 상세 정보를 보여주는 위젯입니다.
@@ -113,7 +113,7 @@ class ReturnOrderDetailView extends StatelessWidget {
               ],
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
