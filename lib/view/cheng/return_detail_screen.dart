@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../config.dart' as config;
 import 'custom/custom.dart';
 import 'customer_sub_dir/customer_info_card.dart';
 
@@ -63,7 +64,7 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
 
     return Scaffold(
       appBar: CustomAppBar(
-        title: '주문 상세',
+        title: Text('반품 상세', style: config.rLabel),
         centerTitle: true,
       ),
       body: SafeArea(

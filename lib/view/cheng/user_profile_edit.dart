@@ -134,6 +134,7 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
         appBar: CustomAppBar(
           title: '개인정보 수정',
           centerTitle: true,
+          titleTextStyle: config.rLabel,
         ),
         body: SafeArea(
           child: Center(
