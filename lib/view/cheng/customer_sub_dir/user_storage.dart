@@ -7,7 +7,36 @@ import '../../../model/customer.dart';
 
 class UserStorage {
   /// GetStorage 인스턴스
-  static final GetStorage _storage = GetStorage();
+  /// 초기화가 필요하므로 lazy initialization 사용
+  static GetStorage? _storageInstance;
+  static bool _isInitialized = false;
+  
+  static GetStorage get _storage {
+    if (_storageInstance == null || !_isInitialized) {
+      // GetStorage가 초기화되지 않았으면 초기화 시도
+      try {
+        // GetStorage.init()이 호출되지 않았을 수 있으므로 명시적으로 초기화 시도
+        if (!_isInitialized) {
+          // get_storage는 자동으로 초기화되지만, 명시적으로 확인
+          _storageInstance = GetStorage();
+          _isInitialized = true;
+        }
+      } catch (e) {
+        // 초기화 실패 시 다시 시도
+        print('GetStorage 초기화 실패, 재시도: $e');
+        try {
+          _storageInstance = GetStorage();
+          _isInitialized = true;
+        } catch (e2) {
+          print('GetStorage 재초기화도 실패: $e2');
+          // 마지막 시도
+          _storageInstance = GetStorage();
+          _isInitialized = true;
+        }
+      }
+    }
+    return _storageInstance!;
+  }
 
   /// 저장 키 상수들
   static const String _keyCustomerId = 'user_customer_id';

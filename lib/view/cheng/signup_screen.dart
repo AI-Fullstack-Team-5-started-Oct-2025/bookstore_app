@@ -570,73 +570,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       // DB에 Customer 데이터 삽입
       // insertK() 함수는 삽입된 행의 ID를 반환합니다.
-      print('\n${'=' * 60}');
-      print('회원가입 처리 시작');
-      print('=' * 60);
-      print('이메일: $email');
-      print('이름: $name');
-      print('전화번호: $phone');
-      
       final insertedId = await customerDAO.insertK(newCustomer.toMap());
-      print('\nCustomer 삽입 결과:');
-      print('  - 삽입된 Customer ID: $insertedId');
-      print('  - 삽입 성공 여부: ${insertedId > 0 ? "성공" : "실패"}');
 
-      // 삽입 성공 확인 (insertedId가 0보다 크면 성공)
+      // 삽입 성공 확인
       if (insertedId > 0) {
         // 로그인 히스토리 저장
-        // 현재 시간을 분까지 string으로 저장 (yyyy-MM-dd HH:mm 형식)
-        final currentTime = CustomCommonUtil.formatDate(
-          DateTime.now(),
-          'yyyy-MM-dd HH:mm',
-        );
-        print('\n로그인 히스토리 저장 시작');
-        print('  - Customer ID (cid): $insertedId');
-        print('  - 로그인 시간 (loginTime): $currentTime');
-        print('  - 상태 (lStatus): ${config.loginStatus[0]}');
-        print('  - 버전 (lVersion): "" (빈 문자열)');
-
-        // LoginHistory 객체 생성
-        final loginHistory = LoginHistory(
-          cid: insertedId, // 방금 가입한 사용자의 ID
-          loginTime: currentTime, // 현재 시간 (분까지)
-          lStatus: config.loginStatus[0] as String, // '활동 회원'
-          lVersion: 0.0, // 버전 (모델 타입상 double이지만, DB에는 빈 문자열로 저장)
-          lAddress: '', // 저장하지 않음 (빈 문자열)
-          lPaymentMethod: '', // 저장하지 않음 (빈 문자열)
-        );
-
-        print('\nLoginHistory 객체 생성 완료:');
-        print('  - cid: ${loginHistory.cid}');
-        print('  - loginTime: ${loginHistory.loginTime}');
-        print('  - lStatus: ${loginHistory.lStatus}');
-        print('  - lVersion: "" (빈 문자열로 저장)');
-        print('  - lAddress: "${loginHistory.lAddress}"');
-        print('  - lPaymentMethod: "${loginHistory.lPaymentMethod}"');
-
-        // DB에 LoginHistory 데이터 삽입
-        // lVersion을 빈 문자열로 저장하기 위해 toMap() 후 수정
         try {
+          final currentTime = CustomCommonUtil.formatDate(
+            DateTime.now(),
+            'yyyy-MM-dd HH:mm',
+          );
+          
+          final double dVersion = config.kVersion.toDouble();
+          
+          final loginHistory = LoginHistory(
+            cid: insertedId,
+            loginTime: currentTime,
+            lStatus: config.loginStatus[0] as String,
+            lVersion: dVersion,
+            lAddress: '',
+            lPaymentMethod: '',
+          );
+          
           final loginHistoryMap = loginHistory.toMap();
-          loginHistoryMap['lVersion'] = ''; // 빈 문자열로 저장
-          final loginHistoryId = await loginHistoryDAO.insertK(loginHistoryMap);
-          print('\n로그인 히스토리 삽입 결과:');
-          print('  - 삽입된 LoginHistory ID: $loginHistoryId');
-          print('  - 삽입 성공 여부: ${loginHistoryId > 0 ? "성공" : "실패"}');
-          print('=' * 60);
-          print('회원가입 및 로그인 히스토리 저장 완료');
-          print('=' * 60 + '\n');
+          await loginHistoryDAO.insertK(loginHistoryMap);
         } catch (e) {
           // 로그인 히스토리 저장 실패는 회원가입 성공에 영향을 주지 않음
-          print('\n⚠️ 로그인 히스토리 저장 실패:');
-          print('  - 에러 내용: $e');
-          print('  - Customer ID: $insertedId');
-          print('=' * 60 + '\n');
         }
-      } else {
-        print('\n⚠️ Customer 삽입 실패');
-        print('  - insertedId: $insertedId');
-        print('=' * 60 + '\n');
       }
 
       // 회원가입 진행 중 상태 해제
@@ -671,8 +631,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
 
       // 회원가입 실패 시 에러 메시지 표시
-      print('회원가입 에러: $e');
-      CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다: ${e.toString()}');
+      CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다.');
     }
   }
 
