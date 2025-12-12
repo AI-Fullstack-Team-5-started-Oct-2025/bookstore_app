@@ -367,6 +367,7 @@ class _AdminProfileEditScreenState extends State<AdminProfileEditScreen> {
         ePhoneNumber: phone,
         eName: name,
         ePassword: password.isNotEmpty ? password : _currentAdmin!.ePassword,
+        eRole: _currentAdmin!.eRole,
       );
       AdminStorage.saveAdmin(updatedEmployee);
       print('get_storage 업데이트 완료');
