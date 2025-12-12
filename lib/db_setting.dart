@@ -81,17 +81,12 @@ class DbSetting {
 
     for(var cItem in _dataSet.customerList)
     {
-      int i = await customerDAO.insertK(cItem.toMap());
-      // Customer result = await customerDAO.queryK({'id': i});
-      // print("result :  ${result.id} / ${result.cPname} / ${result.cPhoneNumber} / ${result.cEmail} / ${result.cPassword}"  );
+      await customerDAO.insertK(cItem.toMap());
     }
 
     for(var eItem in _dataSet.employeeList)
     {
-      int i = await employeeDAO.insertK(eItem.toMap());
-      // Employee result = await employeeDAO.queryK({'id' : i});
-      // print("result :  ${result.id} / ${result.eName} / ${result.ePhoneNumber} / ${result.eEmail} / ${result.ePassword}"  );
+      await employeeDAO.insertK(eItem.toMap());
     }
-
   }
 }

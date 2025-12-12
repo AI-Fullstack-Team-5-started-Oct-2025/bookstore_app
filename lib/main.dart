@@ -1,4 +1,5 @@
 import 'package:bookstore_app/config.dart' as config;
+import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncrate.dart';
 import 'package:bookstore_app/view/cart.dart';
 import 'package:bookstore_app/view/cheng/login_screen.dart';
@@ -34,6 +35,8 @@ Future<void> main() async {
   await deleteDatabase(path);
   await DBCreation.creation(dbName, dVersion);
 
+  DbSetting dbSetting = DbSetting();
+  await dbSetting.svInitDB();
   runApp(const MyApp());
 }
 
