@@ -47,6 +47,7 @@ class AdminStorage {
       ePhoneNumber: phone,
       eName: name,
       ePassword: '', // 비밀번호는 저장하지 않음
+      eRole: getAdminRole(),
     );
   }
 
