@@ -417,37 +417,37 @@ List<Customer> customerList = [
   Customer(
     cEmail: 'jojo@wei.com',
     cPhoneNumber: '222-9898-1212',
-    cPname: '조조',
+    cName: '조조',
     cPassword: 'qwer1234',
   ),
   Customer(
     cEmail: 'handbook@wu.com',
     cPhoneNumber: '999-7676-1987',
-    cPname: '손책',
+    cName: '손책',
     cPassword: 'qwer1234',
   ),
   Customer(
     cEmail: 'bigear@shu.com',
     cPhoneNumber: '000-1234-5678',
-    cPname: '유비',
+    cName: '유비',
     cPassword: 'qwer1234',
   ),
   Customer(
     cEmail: 'jangryo@wei.com',
     cPhoneNumber: '222-3452-7665',
-    cPname: '장료',
+    cName: '장료',
     cPassword: 'qwer1234',
   ),
   Customer(
     cEmail: 'sixhand@wu.com',
     cPhoneNumber: '999-1010-2929',
-    cPname: '육손',
+    cName: '육손',
     cPassword: 'qwer1234',
   ),
   Customer(
     cEmail: 'purpledraong@shu.com',
     cPhoneNumber: '000-0987-6543',
-    cPname: '조자룡',
+    cName: '조자룡',
     cPassword: 'qwer1234',
   ),
 ];
