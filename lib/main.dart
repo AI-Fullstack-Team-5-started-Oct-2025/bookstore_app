@@ -6,7 +6,6 @@ import 'package:bookstore_app/view/customer/address_payment_view.dart';
 import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
 import 'package:bookstore_app/view/customer/purchase_view.dart';
-import 'package:bookstore_app/view/customer/return_view.dart';
 import 'package:bookstore_app/view/customer/search_view.dart';
 import 'package:bookstore_app/view/login.dart';
 import 'package:bookstore_app/view/settings.dart';
@@ -82,7 +81,7 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: '/searchview', page: () => SearchView(),),
         GetPage(name: '/detailview', page: () => DetailView(),),
         GetPage(name: '/purchaseview', page: () => PurchaseView(),),
-        GetPage(name: '/returnview', page: () => ReturnView(),),
+        // GetPage(name: '/returnview', page: () => ReturnView(),),
         GetPage(name: '/address-payment', page: () => AddressPaymentView()),
       ],
       debugShowCheckedModeBanner: false,

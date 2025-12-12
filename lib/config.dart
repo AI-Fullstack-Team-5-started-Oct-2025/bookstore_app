@@ -6,6 +6,7 @@
     11/29/2025 17:40, 'Point 1, Searchview presets', Creator: Chansol, Park
     11/29/2025 17:52, 'Point 2, Price format preset', Creator: Chansol, Park
     12/12/2025 15:55, 'Point 3, PurchaseItem, LoginHistory table added', Creator: Chansol, Park
+    12/12/2025 15:55, 'Point 4, pickupStatus, returnStatus, loginStatus, district added', Creator: zero
   Version: 1.0
   Desc: Config for dbName, version, etc.
 */
@@ -19,6 +20,8 @@ import 'package:intl/intl.dart';
 const String kDBName = 'bookstore';
 const String kDBFileExt = '.db';
 const int kVersion = 1;
+
+
 
 //  Screen Datas
 const seedColorDefault = Colors.deepPurple;
@@ -72,3 +75,53 @@ const String routeSettings = '/settings';
 const String routeProductDetail = '/product';
 const String routeCart = '/cart';
 const String routePurchaseHistory = '/history';
+
+
+// Pickup 상태
+Map pickupStatus = {
+  0 : '제품 준비 중',
+  1 : '제품 준비 완료',
+  2 : '제품 수령 완료'};
+
+// Return 상태
+Map returnStatus = {
+ 0 : '반품 신청',
+ 1 : '반품 처리 중',
+ 2 : '반품 완료'
+};
+
+// 회원 상태 
+Map loginStatus =  {
+  0 : '활동 회원',
+  1 : '휴면 회원',
+  2 : '탈퇴 회원'
+}; 
+
+// 서울 내 자치구 리스트.
+const List<String> district = [
+  '강남구',
+  '강동구',
+  '강북구',
+  '강서구',
+  '관악구',
+  '광진구',
+  '구로구',
+  '금천구',
+  '노원구',
+  '도봉구',
+  '동대문구',
+  '동작구',
+  '마포구',
+  '서대문구',
+  '서초구',
+  '성동구',
+  '성북구',
+  '송파구',
+  '양천구',
+  '영등포구',
+  '용산구',
+  '은평구',
+  '종로구',
+  '중구',
+  '중랑구',
+];
