@@ -5,6 +5,7 @@ import 'custom/custom_common_util.dart';
 import '../../Restitutor_custom/dao_custom.dart';
 import '../../config.dart' as config;
 import '../../model/customer.dart';
+import '../../model/login_history.dart';
 import 'package:bookstore_app/db_setting.dart';
 import 'login_screen.dart';
 
@@ -63,6 +64,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late final DbSetting dbSetting;
   // 고객 데이터 접근 객체 (initState에서 초기화)
   late final RDAO<Customer> customerDAO;
+  // 로그인 히스토리 데이터 접근 객체 (initState에서 초기화)
+  late final RDAO<LoginHistory> loginHistoryDAO;
 
   @override
   void initState() {
@@ -75,6 +78,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       tableName: config.kTableCustomer,
       dVersion: dVersion,
       fromMap: Customer.fromMap,
+    );
+    loginHistoryDAO = RDAO<LoginHistory>(
+      dbName: dbName,
+      tableName: config.kTableLoginHistory,
+      dVersion: dVersion,
+      fromMap: LoginHistory.fromMap,
     );
     
     // DB 초기화는 main.dart에서 이미 수행되므로 여기서는 호출하지 않습니다.
@@ -134,7 +143,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       onTap: _unfocusKeyboard,
       behavior: HitTestBehavior.opaque, // 자식 위젯이 터치를 소비해도 onTap이 호출되도록 설정
       child: Scaffold(
-        appBar: CustomAppBar(title: '회원가입', centerTitle: true, titleTextStyle: config.rLabel),
+        backgroundColor: const Color(0xFFD9D9D9),
+        appBar: CustomAppBar(
+          title: '회원가입',
+          centerTitle: true,
+          titleTextStyle: config.rLabel,
+          backgroundColor: const Color(0xFFD9D9D9),
+          foregroundColor: Colors.black,
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             child: CustomPadding(
@@ -554,7 +570,74 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       // DB에 Customer 데이터 삽입
       // insertK() 함수는 삽입된 행의 ID를 반환합니다.
+      print('\n${'=' * 60}');
+      print('회원가입 처리 시작');
+      print('=' * 60);
+      print('이메일: $email');
+      print('이름: $name');
+      print('전화번호: $phone');
+      
       final insertedId = await customerDAO.insertK(newCustomer.toMap());
+      print('\nCustomer 삽입 결과:');
+      print('  - 삽입된 Customer ID: $insertedId');
+      print('  - 삽입 성공 여부: ${insertedId > 0 ? "성공" : "실패"}');
+
+      // 삽입 성공 확인 (insertedId가 0보다 크면 성공)
+      if (insertedId > 0) {
+        // 로그인 히스토리 저장
+        // 현재 시간을 분까지 string으로 저장 (yyyy-MM-dd HH:mm 형식)
+        final currentTime = CustomCommonUtil.formatDate(
+          DateTime.now(),
+          'yyyy-MM-dd HH:mm',
+        );
+        print('\n로그인 히스토리 저장 시작');
+        print('  - Customer ID (cid): $insertedId');
+        print('  - 로그인 시간 (loginTime): $currentTime');
+        print('  - 상태 (lStatus): ${config.loginStatus[0]}');
+        print('  - 버전 (lVersion): "" (빈 문자열)');
+
+        // LoginHistory 객체 생성
+        final loginHistory = LoginHistory(
+          cid: insertedId, // 방금 가입한 사용자의 ID
+          loginTime: currentTime, // 현재 시간 (분까지)
+          lStatus: config.loginStatus[0] as String, // '활동 회원'
+          lVersion: 0.0, // 버전 (모델 타입상 double이지만, DB에는 빈 문자열로 저장)
+          lAddress: '', // 저장하지 않음 (빈 문자열)
+          lPaymentMethod: '', // 저장하지 않음 (빈 문자열)
+        );
+
+        print('\nLoginHistory 객체 생성 완료:');
+        print('  - cid: ${loginHistory.cid}');
+        print('  - loginTime: ${loginHistory.loginTime}');
+        print('  - lStatus: ${loginHistory.lStatus}');
+        print('  - lVersion: "" (빈 문자열로 저장)');
+        print('  - lAddress: "${loginHistory.lAddress}"');
+        print('  - lPaymentMethod: "${loginHistory.lPaymentMethod}"');
+
+        // DB에 LoginHistory 데이터 삽입
+        // lVersion을 빈 문자열로 저장하기 위해 toMap() 후 수정
+        try {
+          final loginHistoryMap = loginHistory.toMap();
+          loginHistoryMap['lVersion'] = ''; // 빈 문자열로 저장
+          final loginHistoryId = await loginHistoryDAO.insertK(loginHistoryMap);
+          print('\n로그인 히스토리 삽입 결과:');
+          print('  - 삽입된 LoginHistory ID: $loginHistoryId');
+          print('  - 삽입 성공 여부: ${loginHistoryId > 0 ? "성공" : "실패"}');
+          print('=' * 60);
+          print('회원가입 및 로그인 히스토리 저장 완료');
+          print('=' * 60 + '\n');
+        } catch (e) {
+          // 로그인 히스토리 저장 실패는 회원가입 성공에 영향을 주지 않음
+          print('\n⚠️ 로그인 히스토리 저장 실패:');
+          print('  - 에러 내용: $e');
+          print('  - Customer ID: $insertedId');
+          print('=' * 60 + '\n');
+        }
+      } else {
+        print('\n⚠️ Customer 삽입 실패');
+        print('  - insertedId: $insertedId');
+        print('=' * 60 + '\n');
+      }
 
       // 회원가입 진행 중 상태 해제
       setState(() {

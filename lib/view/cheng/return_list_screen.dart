@@ -70,10 +70,13 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFD9D9D9),
       appBar: CustomAppBar(
         title: '수령 완료 목록',
         centerTitle: true,
         titleTextStyle: config.rLabel,
+        backgroundColor: const Color(0xFFD9D9D9),
+        foregroundColor: Colors.black,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

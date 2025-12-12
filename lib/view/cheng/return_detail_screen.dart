@@ -63,9 +63,13 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
     );
 
     return Scaffold(
+      backgroundColor: const Color(0xFFD9D9D9),
       appBar: CustomAppBar(
         title: Text('반품 상세', style: config.rLabel),
         centerTitle: true,
+        titleTextStyle: config.rLabel,
+        backgroundColor: const Color(0xFFD9D9D9),
+        foregroundColor: Colors.black,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -80,8 +84,8 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
                   padding: const EdgeInsets.all(16),
                   child: CustomText(
                     '주문번호: ${widget.orderId}',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
                   ),
                 ),
 
@@ -125,10 +129,10 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
                           children: [
                             Expanded(
                               child: CustomText(
-                                '사이즈: ${item['size']} | 색상: ${item['color']} | 수량: ${item['quantity']}',
-                                fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                                color: Colors.grey.shade600,
+                              '사이즈: ${item['size']} | 색상: ${item['color']} | 수량: ${item['quantity']}',
+                              fontSize: 14,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.grey.shade600,
                               ),
                             ),
                             // 가격 표시 (오른쪽 정렬)

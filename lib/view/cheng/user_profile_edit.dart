@@ -131,10 +131,13 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
       onTap: _unfocusKeyboard,
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
+        backgroundColor: const Color(0xFFD9D9D9),
         appBar: CustomAppBar(
           title: '개인정보 수정',
           centerTitle: true,
           titleTextStyle: config.rLabel,
+          backgroundColor: const Color(0xFFD9D9D9),
+          foregroundColor: Colors.black,
         ),
         body: SafeArea(
           child: Center(
