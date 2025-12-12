@@ -14,6 +14,7 @@ import 'package:bookstore_app/config.dart' as config;
     12/11/2025 14:31, 'Point 1, 최초 업데이트 및 기본 정보 추가', Creator: zero
     12/12/2025 11:16, 'Point 2, 필요 없는 데이터 삭제', Creator: zero
     12/12/2025 14:31, 'Point 3, data_set.dart에 있던 데이터를 가져오고 TableBatch를 이용하여 데이터 세팅', Creator: zero
+    12/12/2025 22:00, 'Point 4, 회원관련 시나리오 수정, purchase, purchaseitem을 multibatch로 묶음', Creator: zero
 
   Version: 1.0
   Dependency: SQFlite, Path, collection
@@ -528,15 +529,51 @@ class DbSetting {
       ],
     );
 
+    TableBatch purchaseBatch = TableBatch(
+    tableName: 'Purchase',
+    rows: [
+      {
+        'cid': 1,
+        'pickupDate': '2023-12-14 07:20',
+        'orderCode': 'orderCode',
+        'timeStamp': '2023-12-12 07:20',
+      },
+      {
+        'cid': 1,
+        'pickupDate': '2023-12-14 07:20',
+        'orderCode': 'orderCode',
+        'timeStamp': '2023-12-12 07:20',
+      },
+      {
+        'cid': 1,
+        'pickupDate': '2023-12-14 07:20',
+        'orderCode': 'orderCode',
+        'timeStamp': '2023-12-12 07:20',
+      },
+      {
+        'cid': 1,
+        'pickupDate': '2023-12-14 07:20',
+        'orderCode': 'orderCode',
+        'timeStamp': '2023-12-12 07:20',
+      },
+      {
+        'cid': 1,
+        'pickupDate': '2023-12-14 07:20',
+        'orderCode': 'orderCode',
+        'timeStamp': '2023-12-12 07:20',
+      },
+    ],
+  );
+
     TableBatch purchaseItemBatch = TableBatch(
       tableName: 'PurchaseItem',
       rows: [
-        {'pid': 1, 'uid': 1, 'pcQuantity': 10, 'pcStatus': '결제 대기'},
-        {'pid': 2, 'uid': 2, 'pcQuantity': 3, 'pcStatus': '결제 대기'},
-        {'pid': 3, 'uid': 2, 'pcQuantity': 6, 'pcStatus': '결제 대기'},
-        {'pid': 4, 'uid': 1, 'pcQuantity': 1, 'pcStatus': '결제 대기'},
-        {'pid': 5, 'uid': 1, 'pcQuantity': 9, 'pcStatus': '결제 대기'},
-        {'pid': 6, 'uid': 1, 'pcQuantity': 11, 'pcStatus': '결제 대기'},
+        {'pid': 1, 'pcid': 1, 'pcQuantity': 10, 'pcStatus': '결제 대기'},
+        {'pid': 2, 'pcid': 2, 'pcQuantity': 3, 'pcStatus': '결제 대기'},
+        {'pid': 3, 'pcid': 2, 'pcQuantity': 6, 'pcStatus': '결제 대기'},
+        {'pid': 4, 'pcid': 3, 'pcQuantity': 1, 'pcStatus': '결제 대기'},
+        {'pid': 5, 'pcid': 4, 'pcQuantity': 9, 'pcStatus': '결제 대기'},
+        {'pid': 6, 'pcid': 5, 'pcQuantity': 11, 'pcStatus': '결제 대기'},
       ],
     );
 
@@ -544,7 +581,6 @@ class DbSetting {
       tableName: 'LoginHistory',
       rows: [
         {
-          'id': 1,
           'cid': 1,
           'loginTime': '2025-12-12 17:05',
           'lStatus': '0',
@@ -553,8 +589,7 @@ class DbSetting {
           'lPaymentMethod': 'KaKaoPay',
         },
         {
-          'id': 2,
-          'cid': 1,
+          'cid': 2,
           'loginTime': '2025-12-12 19:05',
           'lStatus': '0',
           'lVersion': 1,
@@ -562,8 +597,7 @@ class DbSetting {
           'lPaymentMethod': 'KaKaoPay',
         },
         {
-          'id': 3,
-          'cid': 1,
+          'cid': 3,
           'loginTime': '2025-12-12 19:20',
           'lStatus': '0',
           'lVersion': 1,
@@ -571,8 +605,7 @@ class DbSetting {
           'lPaymentMethod': 'KaKaoPay',
         },
         {
-          'id': 4,
-          'cid': 2,
+          'cid': 4,
           'loginTime': '2023-12-12 19:20',
           'lStatus': '0',
           'lVersion': 1,
@@ -580,8 +613,7 @@ class DbSetting {
           'lPaymentMethod': 'KaKaoPay',
         },
         {
-          'id': 5,
-          'cid': 3,
+          'cid': 5,
           'loginTime': '2025-12-12 07:20',
           'lStatus': '2',
           'lVersion': 1,
@@ -589,10 +621,9 @@ class DbSetting {
           'lPaymentMethod': 'KaKaoPay',
         },
         {
-          'id': 6,
-          'cid': 4,
+          'cid': 6,
           'loginTime': '2023-12-12 07:20',
-          'lStatus': '0',
+          'lStatus': '1',
           'lVersion': 1,
           'lAddress': '강남구',
           'lPaymentMethod': 'KaKaoPay',
@@ -603,14 +634,18 @@ class DbSetting {
     final productCombineList = MultiTableBatch(
       tables: [manufacturerBatch, productBaseBatch, imgBatch, productBatch],
     );
-    // final multiBatch = MultiTableBatch(tables: [productBatch,manufacturerBatch,imgBatch]);
+
+    final purchaseCombineList = MultiTableBatch(
+      tables: [purchaseBatch, purchaseItemBatch],
+    );
 
     final assembly = AssemblyDBHandler(
       dbName: '${config.kDBName}${config.kDBFileExt}',
       dVersion: config.kVersion,
     );
 
-    final result = await assembly.insertMultiTableBatch(productCombineList);
+    final productResult = await assembly.insertMultiTableBatch(productCombineList);
+    final purchaseResult = await assembly.insertMultiTableBatch(purchaseCombineList);
 
     final customerDAO = RDAO<Customer>(
       dbName: dbName,
@@ -645,17 +680,17 @@ class DbSetting {
     final purchaseItemResult = await purchaseItem.insertBatch(purchaseItemBatch);
     final loginHistoryResult = await loginHistory.insertBatch(loginHistoryBatch);
 
-    // for (int i = 0; i < result['Manufacturer']!.length; i++) {
-    //   print('Manufacturer : $i , id: ${result['Manufacturer']![i]}');
+    // for (int i = 0; i < productResult['Manufacturer']!.length; i++) {
+    //   print('Manufacturer : $i , id: ${productResult['Manufacturer']![i]}');
     // }
-    // for (int i = 0; i < result['ProductBase']!.length; i++) {
-    //   print('ProductBase : $i , id: ${result['ProductBase']![i]}');
+    // for (int i = 0; i < productResult['ProductBase']!.length; i++) {
+    //   print('ProductBase : $i , id: ${productResult['ProductBase']![i]}');
     // }
-    // for (int i = 0; i < result['ProductImage']!.length; i++) {
-    //   print('ProductImage : $i , id:${result['ProductImage']![i]}');
+    // for (int i = 0; i < productResult['ProductImage']!.length; i++) {
+    //   print('ProductImage : $i , id:${productResult['ProductImage']![i]}');
     // }
-    // for (int i = 0; i < result['Product']!.length; i++) {
-    //   print('Product : $i , id:${result['Product']![i]}');
+    // for (int i = 0; i < productResult['Product']!.length; i++) {
+    //   print('Product : $i , id:${productResult['Product']![i]}');
     // }
     // for (int i = 0; i < customerResult.length; i++) {
     //   print('customerResult : $i , id:${customerResult![i]}');
@@ -668,6 +703,12 @@ class DbSetting {
     // }
     // for (int i = 0; i < loginHistoryResult.length; i++) {
     //   print('LoginHistory : $i , id:${loginHistoryResult[i]}');
+    // }
+    //  for (int i = 0; i < purchaseResult['PurchaseItem']!.length; i++) {
+    //   print('PurchaseItem : $i , id: ${purchaseResult['PurchaseItem']![i]}');
+    // }
+    // for (int i = 0; i < purchaseResult['Purchase']!.length; i++) {
+    //   print('Purchase : $i , id: ${purchaseResult['Purchase']![i]}');
     // }
   }
 }
