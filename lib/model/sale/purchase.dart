@@ -3,6 +3,7 @@
   Create: 10/12/2025 12:35, Creator: Chansol, Park
   Update log: 
     DUMMY 9/29/2025 09:53, 'Point X, Description', Creator: Chansol, Park
+    12/12/2025 20:22, 'Point 1, cid added', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: Purchase Model
@@ -14,8 +15,8 @@
 class Purchase {
   //  Properties
   int? id;
-  int? cid;
-  int? sid;
+  //  Point 1
+  int? cid; //  Customer id
   final String pickupDate;
   final String orderCode;
   final String timeStamp;
@@ -23,8 +24,7 @@ class Purchase {
   // Constructor
   Purchase({
     this.id,
-    this.cid,
-    this.sid,
+    required this.cid,
     required this.pickupDate,
     required this.orderCode,
     required this.timeStamp
@@ -33,10 +33,23 @@ class Purchase {
   Purchase.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
       cid = map['cid'] as int?,
-      sid = map['sid'] as int?,
       pickupDate = map['pickupDate'] as String,
       orderCode = map['orderCode'] as String,
       timeStamp = map['timeStamp'] as String;
 
-  static const List<String> keys = ['id', 'cid', 'sid', 'pickupDate', 'orderCode', 'timeStamp'];
+      Map<String, Object?> toMap({bool includeId = false}) {
+    final map = <String, Object?>{
+      'cid': cid,
+      'pickupDate': pickupDate,
+      'orderCode': orderCode,
+      'timeStamp': timeStamp
+    };
+
+    if (includeId) {
+      map['id'] = id;
+    }
+
+    return map;
+  }
+  static const List<String> keys = ['id', 'cid', 'pickupDate', 'orderCode', 'timeStamp'];
 }
