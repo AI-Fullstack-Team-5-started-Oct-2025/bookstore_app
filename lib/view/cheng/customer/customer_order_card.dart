@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+import '../custom/custom.dart';
+
+/// 고객용 주문 카드 위젯
+/// 고객용 주문 목록 화면에서 사용하는 주문 카드입니다.
+/// 모바일 세로 화면에 최적화되어 있으며, 선택 상태는 필요 없습니다.
+class CustomerOrderCard extends StatelessWidget {
+  /// 주문 ID (주문 번호)
+  final String orderId;
+  /// 주문 상태 (예: 대기중, 준비완료, 픽업완료 등)
+  final String orderStatus;
+  /// 주문 날짜 (선택사항)
+  final String? orderDate;
+  /// 총 주문 금액 (선택사항)
+  final int? totalPrice;
+
+  const CustomerOrderCard({
+    super.key,
+    required this.orderId,
+    required this.orderStatus,
+    this.orderDate,
+    this.totalPrice,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomCard(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      child: CustomColumn(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 8,
+        children: [
+          // 주문 ID와 상태를 한 줄에 표시
+          CustomRow(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 주문 ID (굵은 글씨)
+              CustomText(
+                orderId,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              // 주문 상태 (배지 형태로 표시)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _getStatusColor(orderStatus),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: CustomText(
+                  orderStatus,
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          // 주문 날짜 표시 (있는 경우)
+          if (orderDate != null)
+            CustomText(
+              '주문일: $orderDate',
+              fontSize: 12,
+              fontWeight: FontWeight.normal,
+              color: Colors.grey.shade600,
+            ),
+          // 총 주문 금액 표시 (있는 경우)
+          if (totalPrice != null)
+            CustomText(
+              '총 금액: ${_formatPrice(totalPrice!)}원',
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue.shade700,
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// 주문 상태에 따른 색상 반환
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case '대기중':
+        return Colors.orange;
+      case '준비완료':
+        return Colors.blue;
+      case '픽업완료':
+        return Colors.green;
+      case '반품요청':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  /// 가격 포맷팅 함수 (천 단위 콤마 추가)
+  String _formatPrice(int price) {
+    return price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
+  }
+}
+
