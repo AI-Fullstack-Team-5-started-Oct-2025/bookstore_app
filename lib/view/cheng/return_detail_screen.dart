@@ -63,9 +63,13 @@ class _ReturnDetailScreenState extends State<ReturnDetailScreen> {
     );
 
     return Scaffold(
+      backgroundColor: const Color(0xFFD9D9D9),
       appBar: CustomAppBar(
-        title: Text('반품 상세', style: config.rLabel),
+        title: '반품 상세',
         centerTitle: true,
+        titleTextStyle: config.rLabel,
+        backgroundColor: const Color(0xFFD9D9D9),
+        foregroundColor: Colors.black,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
