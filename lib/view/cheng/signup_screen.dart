@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'custom/custom.dart';
+import 'custom/custom_common_util.dart';
+import '../../Restitutor_custom/dao_custom.dart';
+import '../../config.dart' as config;
+import '../../model/customer.dart';
+import 'package:bookstore_app/db_setting.dart';
+import 'login_screen.dart';
 
-// 회원가입 · 약관 동의 화면
-
+/// 회원가입 · 약관 동의 화면
+/// 사용자가 회원가입을 진행하는 화면입니다.
+/// 이메일, 비밀번호, 이름, 전화번호를 입력받고 약관에 동의한 후 Customer DB에 저장합니다.
+/// 
+/// [testData] 테스트용 더미 데이터 (선택사항)
+/// - 더미 데이터가 제공되면 폼에 자동으로 입력됩니다.
+/// - 회원가입 로직 검증을 위해 사용됩니다.
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  /// 테스트용 더미 데이터 (선택사항)
+  /// 더미 데이터가 제공되면 폼에 자동으로 입력됩니다.
+  final Map<String, String>? testData;
+
+  const SignUpScreen({super.key, this.testData});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -14,8 +30,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // Form 검증을 위한 키
   final _formKey = GlobalKey<FormState>();
 
-  // 아이디 입력 컨트롤러
-  final TextEditingController _idController = TextEditingController();
+  // 이메일 입력 컨트롤러
+  final TextEditingController _emailController = TextEditingController();
 
   // 비밀번호 입력 컨트롤러
   final TextEditingController _passwordController = TextEditingController();
@@ -40,9 +56,71 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _termsError = false;
   bool _privacyError = false;
 
+  // 회원가입 진행 중 상태 (로딩 인디케이터 표시용)
+  bool _isSigningUp = false;
+
+  // 데이터베이스 설정 객체 (initState에서 초기화)
+  late final DbSetting dbSetting;
+  // 고객 데이터 접근 객체 (initState에서 초기화)
+  late final RDAO<Customer> customerDAO;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // 상태 관리 변수 초기화
+    dbSetting = DbSetting();
+    customerDAO = RDAO<Customer>(
+      dbName: dbName,
+      tableName: config.kTableCustomer,
+      dVersion: dVersion,
+      fromMap: Customer.fromMap,
+    );
+    
+    // DB 초기화는 main.dart에서 이미 수행되므로 여기서는 호출하지 않습니다.
+
+    // 테스트용 더미 데이터가 제공되면 폼에 자동 입력
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.testData != null) {
+        _fillFormWithTestData(widget.testData!);
+      }
+    });
+  }
+
+  /// 테스트용 더미 데이터로 폼을 자동으로 채우는 함수
+  /// [testData] 테스트용 더미 데이터 맵 (email, password, name, phone 키 포함)
+  void _fillFormWithTestData(Map<String, String> testData) {
+    setState(() {
+      // 이메일 자동 입력
+      if (testData.containsKey('email')) {
+        _emailController.text = testData['email']!;
+      }
+      // 비밀번호 자동 입력
+      if (testData.containsKey('password')) {
+        _passwordController.text = testData['password']!;
+        _passwordConfirmController.text = testData['password']!;
+      }
+      // 이름 자동 입력
+      if (testData.containsKey('name')) {
+        _nameController.text = testData['name']!;
+      }
+      // 전화번호 자동 입력
+      if (testData.containsKey('phone')) {
+        _phoneController.text = testData['phone']!;
+      }
+      // 약관 동의 자동 체크 (테스트 편의를 위해)
+      if (testData.containsKey('autoAgree') && testData['autoAgree'] == 'true') {
+        _agreeAll = true;
+        _agreeTerms = true;
+        _agreePrivacy = true;
+        _agreeMarketing = true;
+      }
+    });
+  }
+
   @override
   void dispose() {
-    _idController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
     _nameController.dispose();
@@ -217,15 +295,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       spacing: 10,
                       children: [
-                        // 아이디 입력 필드 (Form 검증)
+                        // 이메일 입력 필드 (Form 검증)
                         CustomTextField(
-                          controller: _idController,
-                          labelText: '아이디',
-                          hintText: '아이디를 입력하세요',
-                          keyboardType: TextInputType.text,
-                          prefixIcon: const Icon(Icons.person),
+                          controller: _emailController,
+                          labelText: '이메일',
+                          hintText: '이메일을 입력하세요',
+                          keyboardType: TextInputType.emailAddress,
+                          prefixIcon: const Icon(Icons.email),
                           required: true,
-                          requiredMessage: '아이디를 입력해주세요',
+                          requiredMessage: '이메일을 입력해주세요',
                         ),
 
                         // 비밀번호 입력 필드 (Form 검증)
@@ -272,12 +350,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   const SizedBox(height: 8),
 
                   // 회원가입 버튼
-                  CustomButton(
-                    btnText: '회원가입',
-                    buttonType: ButtonType.elevated,
-                    onCallBack: _handleSignUp,
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
+                  // 회원가입 진행 중일 때는 로딩 인디케이터 표시
+                  _isSigningUp
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Column(
+                              children: [
+                                const CircularProgressIndicator(),
+                                const SizedBox(height: 12),
+                                CustomText(
+                                  '회원가입 처리 중...',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey[600],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : CustomButton(
+                          btnText: '회원가입',
+                          buttonType: ButtonType.elevated,
+                          onCallBack: _handleSignUp,
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
                 ],
               ),
             ),
@@ -336,8 +433,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
-  // 회원가입 버튼 클릭 처리
-  void _handleSignUp() {
+  /// 회원가입 버튼 클릭 처리 함수
+  /// 약관 동의 확인, 입력값 검증, 중복 확인 후 Customer DB에 저장합니다.
+  Future<void> _handleSignUp() async {
+    // 이미 회원가입 진행 중이면 중복 실행 방지
+    if (_isSigningUp) {
+      return;
+    }
+
     // 키보드 내리기
     FocusScope.of(context).unfocus();
 
@@ -352,7 +455,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    // Form 검증 (아이디, 비밀번호)
+    // Form 검증 (이메일, 비밀번호)
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -369,20 +472,125 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    final id = _idController.text.trim();
+    final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final passwordConfirm = _passwordConfirmController.text.trim();
     final name = _nameController.text.trim();
     final phone = _phoneController.text.trim();
 
+    // 이메일 형식 검증
+    // CustomCommonUtil.isEmail() 함수를 사용하여 정규식으로 이메일 형식을 검증합니다.
+    if (!CustomCommonUtil.isEmail(email)) {
+      CustomSnackBar.showError(context, message: '올바른 이메일 형식을 입력해주세요');
+      return;
+    }
+
     // 비밀번호 일치 확인
+    // 비밀번호와 비밀번호 확인 필드의 값이 일치하는지 확인합니다.
     if (password != passwordConfirm) {
       CustomSnackBar.showError(context, message: '비밀번호가 일치하지 않습니다');
       return;
     }
 
-    // TODO: 회원가입 로직 구현
-    print('회원가입 시도: $id, $name, $phone');
+    // 이메일 중복 확인
+    // DB에서 동일한 이메일을 가진 고객이 이미 존재하는지 확인합니다.
+    // 중복된 이메일이 있으면 회원가입을 중단합니다.
+    try {
+      final existingCustomers = await customerDAO.queryK({'cEmail': email});
+      if (existingCustomers.isNotEmpty) {
+        CustomSnackBar.showError(context, message: '이미 사용 중인 이메일입니다');
+        return;
+      }
+    } catch (e) {
+      // 이메일이 없으면 정상 (EMPTY 예외는 무시)
+      // queryK 함수는 결과가 없으면 'EMPTY' 예외를 발생시키므로, 이를 정상 케이스로 처리합니다.
+      if (e.toString().contains('EMPTY')) {
+        // 이메일이 없으므로 계속 진행 (중복 없음)
+      } else {
+        // 다른 에러 발생 시 에러 메시지 표시
+        print('이메일 중복 확인 에러: $e');
+        CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다');
+        return;
+      }
+    }
+
+    // 전화번호 중복 확인
+    // DB에서 동일한 전화번호를 가진 고객이 이미 존재하는지 확인합니다.
+    // 중복된 전화번호가 있으면 회원가입을 중단합니다.
+    try {
+      final existingCustomers = await customerDAO.queryK({'cPhoneNumber': phone});
+      if (existingCustomers.isNotEmpty) {
+        CustomSnackBar.showError(context, message: '이미 사용 중인 전화번호입니다');
+        return;
+      }
+    } catch (e) {
+      // 전화번호가 없으면 정상 (EMPTY 예외는 무시)
+      // queryK 함수는 결과가 없으면 'EMPTY' 예외를 발생시키므로, 이를 정상 케이스로 처리합니다.
+      if (e.toString().contains('EMPTY')) {
+        // 전화번호가 없으므로 계속 진행 (중복 없음)
+      } else {
+        // 다른 에러 발생 시 에러 메시지 표시
+        print('전화번호 중복 확인 에러: $e');
+        CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다');
+        return;
+      }
+    }
+
+    // 회원가입 진행 중 상태로 변경 (로딩 인디케이터 표시)
+    setState(() {
+      _isSigningUp = true;
+    });
+
+    // Customer 객체 생성 및 DB에 저장
+    // 모든 검증을 통과한 경우, Customer 객체를 생성하고 customerDAO.insertK()를 사용하여 DB에 저장합니다.
+    try {
+      // Customer 객체 생성 (id는 자동 증가하므로 포함하지 않음)
+      final newCustomer = Customer(
+        cEmail: email,
+        cPhoneNumber: phone,
+        cName: name,
+        cPassword: password,
+      );
+
+      // DB에 Customer 데이터 삽입
+      // insertK() 함수는 삽입된 행의 ID를 반환합니다.
+      final insertedId = await customerDAO.insertK(newCustomer.toMap());
+
+      // 회원가입 진행 중 상태 해제
+      setState(() {
+        _isSigningUp = false;
+      });
+
+      // 삽입 성공 확인 (insertedId가 0보다 크면 성공)
+      if (insertedId > 0) {
+        // 회원가입 성공 메시지 표시
+        Get.snackbar(
+          '회원가입 성공',
+          '회원가입이 완료되었습니다. 로그인해주세요.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.shade100,
+          colorText: Colors.green.shade900,
+          duration: const Duration(seconds: 2),
+        );
+
+        // 잠시 대기 후 회원 로그인 페이지로 이동
+        await Future.delayed(const Duration(milliseconds: 500));
+        // 현재 화면을 모두 제거하고 로그인 화면으로 이동
+        Get.offAll(() => const LoginScreen());
+      } else {
+        // 삽입 실패 (insertedId가 0이면 실패)
+        CustomSnackBar.showError(context, message: '회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (e) {
+      // 회원가입 진행 중 상태 해제
+      setState(() {
+        _isSigningUp = false;
+      });
+
+      // 회원가입 실패 시 에러 메시지 표시
+      print('회원가입 에러: $e');
+      CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다: ${e.toString()}');
+    }
   }
 
   // 약관 보기 다이얼로그 표시
