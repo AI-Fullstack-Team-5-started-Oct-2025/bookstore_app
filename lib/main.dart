@@ -1,11 +1,14 @@
 import 'package:bookstore_app/config.dart' as config;
+import 'package:bookstore_app/mv/oncrate.dart';
+import 'package:bookstore_app/view/cart.dart';
 import 'package:bookstore_app/view/cheng/login_screen.dart';
 import 'package:bookstore_app/view/login.dart';
+import 'package:bookstore_app/view/detail_view.dart';
+import 'package:bookstore_app/view/purchase_view.dart';
 import 'package:bookstore_app/view/search_view.dart';
 import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -22,11 +25,14 @@ import 'package:sqflite/sqflite.dart';
 // );
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final String dbName = '${config.kDBName}${config.kDBFileExt}';
+  final int dVersion = config.kVersion;
 
   final dbPath = await getDatabasesPath();
 
   final path = join(dbPath, '${config.kDBName}${config.kDBFileExt}');
   await deleteDatabase(path);
+  await DBCreation.creation(dbName, dVersion);
 
   runApp(const MyApp());
 }
@@ -43,7 +49,7 @@ class _MyAppState extends State<MyApp> {
 
   Color _seedColor = Colors.deepPurple;
 
-  _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
+  void _changedSettings(ThemeMode inputThemeMode, Color inputColorScheme) {
     _themeMode = inputThemeMode;
     _seedColor = inputColorScheme;
     setState(() {});
@@ -65,8 +71,11 @@ class _MyAppState extends State<MyApp> {
         colorSchemeSeed: _seedColor,
       ),
       initialRoute: '/',
-      getPages: [GetPage(name: '/', page: () => LoginScreen(),)
-
+      getPages: [
+        GetPage(name: '/', page: () => LoginScreen(),),
+        GetPage(name: '/cart', page: () => Cart(),),
+        GetPage(name: '/purchaseview', page: () => PurchaseView(),),
+        GetPage(name: '/searchview', page: () => SearchView(),)
       ],
       debugShowCheckedModeBanner: false,
     );
