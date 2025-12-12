@@ -1,6 +1,8 @@
 /// 전역 저장소 클래스
 /// 
-/// Map, List뿐만 아니라 String, int, bool, double 등 모든 타입을 키-값 형태로 저장하고 관리하는 전역 저장소입니다.
+/// 메모리 기반 휘발성 저장소입니다.
+/// 앱을 종료하면 데이터가 사라지며, Map, List뿐만 아니라 String, int, bool, double 등 모든 타입을 키-값 형태로 저장하고 관리합니다.
+/// 앱 사용 중에만 데이터가 유지되는 임시 저장소로 사용합니다.
 /// 
 /// 사용 예시:
 /// ```dart
@@ -38,7 +40,7 @@ class GlobalStorage {
   
   GlobalStorage._();
 
-  /// 내부 저장소 (키-값 쌍)
+  /// 내부 저장소 (키-값 쌍) - 메모리 기반 휘발성 저장소
   final Map<String, dynamic> _storage = {};
 
   /// 값을 저장합니다.
@@ -47,6 +49,7 @@ class GlobalStorage {
   /// [value] 저장할 값 (Map, List, String, int, bool, double 등 모든 타입 가능)
   /// 
   /// 키가 이미 존재하는 경우 기존 값을 덮어씁니다.
+  /// 메모리 기반 저장소이므로 앱을 종료하면 데이터가 사라집니다.
   /// 
   /// 사용 예시:
   /// ```dart
