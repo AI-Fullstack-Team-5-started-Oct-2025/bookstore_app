@@ -56,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    print("히히히히");
     // DB 초기화는 main.dart에서 이미 수행되므로 여기서는 호출하지 않습니다.
   }
 
@@ -720,6 +721,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void _navigateToTestPage() {
     Get.to(() => const TestNavigationPage());
   }
-
+  
   //----Function End----
 }
