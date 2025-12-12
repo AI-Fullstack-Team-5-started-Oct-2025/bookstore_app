@@ -1,12 +1,11 @@
 import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncrate.dart';
-import 'package:bookstore_app/view/cart.dart';
 import 'package:bookstore_app/view/cheng/login_screen.dart';
+import 'package:bookstore_app/view/customer/cart.dart';
+import 'package:bookstore_app/view/customer/purchase_view.dart';
+import 'package:bookstore_app/view/customer/search_view.dart';
 import 'package:bookstore_app/view/login.dart';
-import 'package:bookstore_app/view/detail_view.dart';
-import 'package:bookstore_app/view/purchase_view.dart';
-import 'package:bookstore_app/view/search_view.dart';
 import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
