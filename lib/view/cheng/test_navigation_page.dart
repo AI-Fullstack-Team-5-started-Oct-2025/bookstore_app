@@ -8,6 +8,8 @@ import 'admin_login.dart';
 import 'admin_employee_order_view.dart';
 import 'admin_employee_return_order_view.dart';
 import 'user_profile_edit.dart';
+import 'order_list_screen.dart';
+import 'return_list_screen.dart';
 import '../../Restitutor_custom/dao_custom.dart';
 import '../../model/customer.dart';
 import '../../config.dart' as config;
@@ -83,6 +85,18 @@ class TestNavigationPage extends StatelessWidget {
                   btnText: '반품 관리 화면',
                   buttonType: ButtonType.elevated,
                   onCallBack: () => _navigateToReturnOrderView(context),
+                  minimumSize: const Size(double.infinity, 56),
+                ),
+                CustomButton(
+                  btnText: '고객용 주문 목록 화면',
+                  buttonType: ButtonType.elevated,
+                  onCallBack: () => _navigateToCustomerOrderList(context),
+                  minimumSize: const Size(double.infinity, 56),
+                ),
+                CustomButton(
+                  btnText: '고객용 반품 목록 화면',
+                  buttonType: ButtonType.elevated,
+                  onCallBack: () => _navigateToCustomerReturnList(context),
                   minimumSize: const Size(double.infinity, 56),
                 ),
                 const SizedBox(height: 32),
@@ -182,6 +196,16 @@ class TestNavigationPage extends StatelessWidget {
   // 반품 관리 화면으로 이동
   void _navigateToReturnOrderView(BuildContext context) {
     Get.to(() => const AdministerEmployeeReturnOrderView());
+  }
+
+  // 고객용 주문 목록 화면으로 이동
+  void _navigateToCustomerOrderList(BuildContext context) {
+    Get.to(() => const OrderListScreen());
+  }
+
+  // 고객용 반품 목록 화면으로 이동
+  void _navigateToCustomerReturnList(BuildContext context) {
+    Get.to(() => const ReturnListScreen());
   }
 
   /// 등록된 모든 사용자를 터미널에 출력하는 함수

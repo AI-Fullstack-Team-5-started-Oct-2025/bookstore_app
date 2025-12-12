@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../custom/custom.dart';
-import '../customer/customer_info_card.dart';
+import '../customer_sub_dir/customer_info_card.dart';
 import 'order_utils.dart';
 
 /// 주문 상세 정보 뷰
@@ -123,7 +123,7 @@ class OrderDetailView extends StatelessWidget {
               ],
             ),
           );
-        }).toList(),
+        }),
 
         // 총 가격 표시 (오른쪽 정렬)
         CustomRow(
