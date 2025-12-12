@@ -253,6 +253,9 @@ class TestNavigationPage extends StatelessWidget {
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e, stackTrace) {
+      print('error: $e');
+      print('stackTrace: $stackTrace');
+      print('---------------');
       print('\n${'=' * 60}');
       print('에러 발생: $e');
       print('스택 트레이스:');
