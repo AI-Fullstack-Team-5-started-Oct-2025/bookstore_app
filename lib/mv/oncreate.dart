@@ -15,6 +15,7 @@ import 'package:sqflite/sqflite.dart';
     12/12/2025 14:38, 'Point 5, Modified Product attribute(pQuantity), Created PurchaseItem, LoginHistory', Creator: Chansol Park
     12/12/2025 15:28, 'Point 6, Modified PurchaseItem pcStatus', Creator: Chansol Park
     12/12/2025 16:43, 'Point 7, Modified PurchaseItem uid', Creator: Chansol Park
+    12/12/2025 20:23, 'Point 8, Modified PurchaseItem uid -> pcid, Created Purchase', Creator: Chansol Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
@@ -109,15 +110,24 @@ class DBCreation {
         ''');
 
         //  Point 6
-        //  Point 7
+        //  Point 7 Point 8
         //  PurchaseItem
         await db.execute('''
           create table PurchaseItem (
             id integer primary key autoincrement,
             pid integer,
-            uid integer,
+            pcid integer,
             pcQuantity integer,
             pcStatus text
+          )
+        ''');
+        await db.execute('''
+          create table Purchase (
+            id integer primary key autoincrement,
+            cid integer,
+            pickupDate text,
+            orderCode text,
+            timeStamp text
           )
         ''');
 
