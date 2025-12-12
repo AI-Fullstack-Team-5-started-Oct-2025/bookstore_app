@@ -11,6 +11,7 @@ import 'package:bookstore_app/view/login.dart';
 import 'package:bookstore_app/view/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -26,6 +27,9 @@ import 'package:sqflite/sqflite.dart';
 //   ],
 // );
 Future<void> main() async {
+    
+  // GetStorage 초기화 (get_storage 사용 전 필수)
+  await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   final String dbName = '${config.kDBName}${config.kDBFileExt}';
   final int dVersion = config.kVersion;

@@ -11,7 +11,9 @@ import 'user_profile_edit.dart';
 import 'order_list_screen.dart';
 import 'return_list_screen.dart';
 import '../../Restitutor_custom/dao_custom.dart';
+import '../../view/customer/search_view.dart';
 import '../../model/customer.dart';
+import '../../model/login_history.dart';
 import '../../config.dart' as config;
 
 // 네비게이션 테스트 페이지
@@ -22,7 +24,14 @@ class TestNavigationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: '네비게이션 테스트', centerTitle: true, titleTextStyle: config.rLabel),
+      backgroundColor: const Color(0xFFD9D9D9),
+      appBar: CustomAppBar(
+        title: '네비게이션 테스트',
+        centerTitle: true,
+        titleTextStyle: config.rLabel,
+        backgroundColor: const Color(0xFFD9D9D9),
+        foregroundColor: Colors.black,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: CustomPadding(
@@ -99,6 +108,12 @@ class TestNavigationPage extends StatelessWidget {
                   onCallBack: () => _navigateToCustomerReturnList(context),
                   minimumSize: const Size(double.infinity, 56),
                 ),
+                CustomButton(
+                  btnText: '검색 화면',
+                  buttonType: ButtonType.elevated,
+                  onCallBack: () => _navigateToSearchView(context),
+                  minimumSize: const Size(double.infinity, 56),
+                ),
                 const SizedBox(height: 32),
                 CustomText(
                   'DB 테스트',
@@ -110,6 +125,12 @@ class TestNavigationPage extends StatelessWidget {
                       btnText: '모든 사용자 출력',
                       buttonType: ButtonType.elevated,
                       onCallBack: () => _printRecentCustomers(context),
+                      minimumSize: const Size(double.infinity, 56),
+                    ),
+                    CustomButton(
+                      btnText: '로그인 히스토리 전체 출력',
+                      buttonType: ButtonType.elevated,
+                      onCallBack: () => _printAllLoginHistory(context),
                       minimumSize: const Size(double.infinity, 56),
                     ),
                 // const SizedBox(height: 32),
@@ -208,6 +229,11 @@ class TestNavigationPage extends StatelessWidget {
     Get.to(() => const ReturnListScreen());
   }
 
+  // 검색 화면으로 이동
+  void _navigateToSearchView(BuildContext context) {
+    Get.to(() => const SearchView());
+  }
+
   /// 등록된 모든 사용자를 터미널에 출력하는 함수
   /// Customer DB에서 모든 사용자를 조회하고, ID 기준으로 정렬하여 모두 출력합니다.
   Future<void> _printRecentCustomers(BuildContext context) async {
@@ -288,6 +314,93 @@ class TestNavigationPage extends StatelessWidget {
       Get.snackbar(
         '에러',
         '사용자 정보를 가져오는 중 오류가 발생했습니다: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        colorText: Colors.red.shade900,
+        duration: const Duration(seconds: 5),
+      );
+    }
+  }
+
+  /// 등록된 모든 로그인 히스토리를 터미널에 출력하는 함수
+  /// LoginHistory DB에서 모든 로그인 히스토리를 조회하고, ID 기준으로 정렬하여 모두 출력합니다.
+  Future<void> _printAllLoginHistory(BuildContext context) async {
+    try {
+      // LoginHistory DAO 생성
+      final loginHistoryDAO = RDAO<LoginHistory>(
+        dbName: dbName,
+        tableName: config.kTableLoginHistory,
+        dVersion: dVersion,
+        fromMap: LoginHistory.fromMap,
+      );
+
+      print('\n${'=' * 60}');
+      print('로그인 히스토리 DB 조회 시작...');
+      print('=' * 60);
+
+      // 모든 LoginHistory 조회
+      final allLoginHistory = await loginHistoryDAO.queryAll();
+
+      print('조회된 로그인 히스토리 수: ${allLoginHistory.length}');
+
+      if (allLoginHistory.isEmpty) {
+        print('=' * 60);
+        print('등록된 로그인 히스토리가 없습니다.');
+        print('=' * 60);
+        print('\n💡 팁: 회원가입을 하면 로그인 히스토리가 자동으로 생성됩니다.');
+        print('=' * 60 + '\n');
+        Get.snackbar(
+          '알림',
+          '등록된 로그인 히스토리가 없습니다.\n회원가입을 하면 로그인 히스토리가 자동으로 생성됩니다.',
+          snackPosition: SnackPosition.BOTTOM,
+          duration: const Duration(seconds: 3),
+        );
+        return;
+      }
+
+      // ID 기준으로 정렬 (내림차순: 최신순)
+      allLoginHistory.sort((a, b) => (b.id ?? 0).compareTo(a.id ?? 0));
+
+      // 모든 로그인 히스토리 출력
+      // 터미널에 출력
+      print('\n${'=' * 60}');
+      print('등록된 모든 로그인 히스토리 (총 ${allLoginHistory.length}개)');
+      print('=' * 60);
+      
+      for (int i = 0; i < allLoginHistory.length; i++) {
+        final history = allLoginHistory[i];
+        print('\n[${i + 1}번째 로그인 히스토리]');
+        print('  ID: ${history.id}');
+        print('  Customer ID (cid): ${history.cid}');
+        print('  로그인 시간 (loginTime): ${history.loginTime}');
+        print('  상태 (lStatus): ${history.lStatus}');
+        print('  버전 (lVersion): ${history.lVersion}');
+        print('  주소 (lAddress): "${history.lAddress}"');
+        print('  결제 방법 (lPaymentMethod): "${history.lPaymentMethod}"');
+        print('-' * 60);
+      }
+      
+      print('\n총 ${allLoginHistory.length}개의 로그인 히스토리가 등록되어 있습니다.');
+      print('=' * 60 + '\n');
+
+      // 사용자에게 알림 표시
+      Get.snackbar(
+        '출력 완료',
+        '터미널에 등록된 모든 로그인 히스토리 ${allLoginHistory.length}개를 출력했습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e, stackTrace) {
+      print('error: $e');
+      print('stackTrace: $stackTrace');
+      print('---------------');
+      print('\n${'=' * 60}');
+      print('에러 발생: $e');
+      print('스택 트레이스:');
+      print(stackTrace);
+      print('=' * 60 + '\n');
+      Get.snackbar(
+        '에러',
+        '로그인 히스토리 정보를 가져오는 중 오류가 발생했습니다: $e',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade100,
         colorText: Colors.red.shade900,
