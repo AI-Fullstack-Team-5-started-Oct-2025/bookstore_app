@@ -2,6 +2,7 @@ import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncrate.dart';
 import 'package:bookstore_app/view/cheng/login_screen.dart';
+import 'package:bookstore_app/view/customer/address_payment_view.dart';
 import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
 import 'package:bookstore_app/view/customer/purchase_view.dart';
@@ -82,6 +83,7 @@ class _MyAppState extends State<MyApp> {
         GetPage(name: '/detailview', page: () => DetailView(),),
         GetPage(name: '/purchaseview', page: () => PurchaseView(),),
         GetPage(name: '/returnview', page: () => ReturnView(),),
+        GetPage(name: '/address-payment', page: () => AddressPaymentView()),
       ],
       debugShowCheckedModeBanner: false,
     );

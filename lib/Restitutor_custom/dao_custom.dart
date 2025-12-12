@@ -124,12 +124,27 @@ class RDAO<T> {
 
   //  DBHandler.insertK(Tablename.toMap());
   Future<int> insertK(Map<String, Object?> data) async {
+  try {
     final db = await RDB.instance(dbName, dVersion);
+
     final keys = data.keys.join(', ');
     final placeholders = List.filled(data.length, '?').join(', ');
     final sql = 'INSERT INTO $tableName ($keys) VALUES ($placeholders)';
-    return db.rawInsert(sql, data.values.toList());
+
+    final result = await db.rawInsert(sql, data.values.toList());
+
+    // 성공 → rowId 반환 (rawInsert는 rowId를 반환)
+    return result;
+  } on DatabaseException catch (e) {
+    // SQLite 관련 에러
+    print('INSERT DB Error in $tableName → $e');
+    return -1; // 실패 시 구분 값
+  } catch (e) {
+    // 그 외 모든 오류
+    print('UNKNOWN INSERT Error in $tableName → $e');
+    return -1; // 실패 시 구분 값
   }
+}
 
   // DBHandler.updateK(Tablename.toMap(), KeyListTable.toMap())
   Future<int> updateK(

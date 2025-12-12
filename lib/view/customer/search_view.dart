@@ -175,6 +175,10 @@ class _SearchViewState extends State<SearchView> {
             title: Text('주문 내역'),
           ),
           ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('배송지, 결제 방법 수정'),
+          ),
+          ListTile(
             leading: Icon(Icons.logout),
             title: Text('로그아웃'),
           ),
