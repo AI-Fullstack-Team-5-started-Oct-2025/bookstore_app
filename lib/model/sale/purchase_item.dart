@@ -3,6 +3,8 @@
   Create: 10/12/2025 12:42, Creator: Chansol, Park
   Update log: 
     DUMMY 9/29/2025 09:53, 'Point X, Description', Creator: Chansol, Park
+    12/12/2025 14:27, 'Point 1, Removed quantity', Creator: Chansol, Park
+    12/12/2025 14:27, 'Point 2, Purchase item Quantity, rebuild attributes, toMap', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: PurchaseItem Model
@@ -13,33 +15,39 @@
 
 class PurchaseItem {
   //  Properties
+  //  Point 1
   int? id;
-  int? pid;
-  int? asid;
-  int? pdid;
-  final String returnDate;
-  final String unitPrice;
-  final String quantity;
+  int? pid; //  Product id
+  //  Point 2
+  int pcQuantity; //  Purchase Item Quantity
+
+
 
   // Constructor
   PurchaseItem({
     this.id,
     this.pid,
-    this.asid,
-    this.pdid,
-    required this.returnDate,
-    required this.unitPrice,
-    required this.quantity
+    required this.pcQuantity,
   });
 
   PurchaseItem.fromMap(Map<String, Object?> map)
     : id = map['id'] as int?,
       pid = map['pid'] as int?,
-      asid = map['asid'] as int?,
-      pdid = map['pdid'] as int?,
-      returnDate = map['returnDate'] as String,
-      unitPrice = map['unitPrice'] as String,
-      quantity = map['quantity'] as String;
+      pcQuantity = map['pcQuantity'] as int;
 
-  static const List<String> keys = ['id', 'pid', 'asid', 'pdid', 'returnDate', 'unitPrice', 'quantity'];
+  //  Point 2
+  Map<String, Object?> toMap({bool includeId = false}) {
+    final map = <String, Object?>{
+      'pid': pid,
+      'asid': pcQuantity
+    };
+
+    if (includeId) {
+      map['id'] = id;
+    }
+
+    return map;
+  }
+
+  static const List<String> keys = ['id', 'pid', 'pcQuantity'];
 }
