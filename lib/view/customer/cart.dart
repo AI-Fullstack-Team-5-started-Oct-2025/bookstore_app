@@ -48,7 +48,9 @@ class _CartState extends State<Cart> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: dProductNames.length, //  NEED to fix on actual release
+              itemCount: dProductNames.isEmpty
+                  ? 0
+                  : dProductNames.length, //  NEED to fix on actual release
               itemBuilder: (context, index) {
                 return Card(
                   elevation: 10,
@@ -61,7 +63,7 @@ class _CartState extends State<Cart> {
                         fit: BoxFit.contain,
                       ),
                       SizedBox(width: 20),
-                      Text(dProductNames[index], style: config.rLabel,),
+                      Text(dProductNames[index], style: config.rLabel),
                     ],
                   ),
                 );
@@ -79,10 +81,7 @@ class _CartState extends State<Cart> {
               // 구매 로직
               print("구매하기!");
             },
-            child: Text(
-              "구매하기",
-              style: config.rLabel,
-            ),
+            child: Text("구매하기", style: config.rLabel),
           ),
         ),
       ),
