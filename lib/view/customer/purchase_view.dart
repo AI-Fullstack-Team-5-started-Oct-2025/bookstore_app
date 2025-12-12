@@ -32,7 +32,7 @@ class _PurchaseViewState extends State<PurchaseView> {
     super.initState();
     purchaseList = Get.arguments; //  MUST given by cart.dart
     //  Dummy
-    purchaseList = List.filled(1, PurchaseItem(pid: 1, uid: 1, pcQuantity: 30, pcStatus: '결제 대기'));
+    purchaseList = List.filled(1, PurchaseItem(pid: 1, pcid: 1, pcQuantity: 30, pcStatus: '결제 대기'));
   }
 
   @override

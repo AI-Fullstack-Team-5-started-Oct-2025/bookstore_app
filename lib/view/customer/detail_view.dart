@@ -4,7 +4,7 @@ import 'package:bookstore_app/model/product/manufacturer.dart';
 import 'package:bookstore_app/model/product/product.dart';
 import 'package:bookstore_app/model/product/product_base.dart';
 import 'package:bookstore_app/model/product/product_image.dart';
-import 'package:bookstore_app/mv/oncrate.dart';
+import 'package:bookstore_app/mv/oncreate.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
