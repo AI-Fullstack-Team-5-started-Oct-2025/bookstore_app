@@ -5,6 +5,7 @@
     DUMMY 9/29/2025 09:53, 'Point X, Description', Creator: Chansol, Park
     11/29/2025 17:40, 'Point 1, Searchview presets', Creator: Chansol, Park
     11/29/2025 17:52, 'Point 2, Price format preset', Creator: Chansol, Park
+    12/12/2025 15:55, 'Point 3, PurchaseItem, LoginHistory table added', Creator: Chansol, Park
   Version: 1.0
   Desc: Config for dbName, version, etc.
 */
@@ -60,6 +61,9 @@ const String kTableProductBase = 'ProductBase';
 const String kTableManufacturer = 'Manufacturer';
 const String kTableProduct = 'Product';
 const String tTableEmployee = 'Employee';
+//  Point 3
+const String kTableLoginHistory = 'LoginHistory';
+const String kTablePurchaseItem = 'PurchaseItem';
 
 
 //  Routes
