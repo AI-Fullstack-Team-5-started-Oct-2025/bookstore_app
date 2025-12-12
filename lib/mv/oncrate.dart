@@ -11,6 +11,7 @@ import 'package:sqflite/sqflite.dart';
     9/29/2025 11:17, 'Delete OBSOLETE Functions', Creator: Chansol, Park
     11/29/2025 11:28, 'Point 2, Total class refactored by GPT', Creator: Chansol, Park
     11/29/2025 11:28, 'Point 3, Customer, Employee added', Creator: Chansol, Park
+    12/12/2025 10:55, 'Point 4, Customer.CPname > Customer.cName', Creator: Zero
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
@@ -84,10 +85,10 @@ class DBCreation {
             id integer primary key autoincrement,
             cEmail text,
             cPhoneNumber text,
-            cPname text,
+            cName text,
             cPassword text
           )
-        ''');
+        ''');// Point 4
         
         //  Employee
         await db.execute('''
