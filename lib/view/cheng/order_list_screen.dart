@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../config.dart' as config;
 import 'custom/custom.dart';
 import 'customer_sub_dir/customer_order_card.dart';
 import 'order_detail_screen.dart';
@@ -76,6 +77,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
       appBar: CustomAppBar(
         title: '수령 목록',
         centerTitle: true,
+        titleTextStyle: config.rLabel,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

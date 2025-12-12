@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
       onTap: _unfocusKeyboard,
       behavior: HitTestBehavior.opaque, // 자식 위젯이 터치를 소비해도 onTap이 호출되도록 설정
       child: Scaffold(
-        appBar: CustomAppBar(title: '로그인', centerTitle: true),
+        appBar: CustomAppBar(title: '로그인', centerTitle: true, titleTextStyle: config.rLabel),
         body: SafeArea(
           child: SingleChildScrollView(
             child: CustomColumn(
