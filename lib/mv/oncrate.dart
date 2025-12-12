@@ -12,6 +12,7 @@ import 'package:sqflite/sqflite.dart';
     11/29/2025 11:28, 'Point 2, Total class refactored by GPT', Creator: Chansol, Park
     11/29/2025 11:28, 'Point 3, Customer, Employee added', Creator: Chansol, Park
     12/12/2025 10:55, 'Point 4, Customer.CPname > Customer.cName', Creator: Zero
+    12/12/2025 14:38, 'Point 5, Modified Product attribute(pQuantity), Created PurchaseItem, LoginHistory', Creator: Chansol Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
@@ -35,6 +36,7 @@ class DBCreation {
       version: dVersion,
       onCreate: (db, version) async {
 
+        //  Point 5
         //  Product
         await db.execute('''
           create table Product (
@@ -42,7 +44,8 @@ class DBCreation {
             pbid integer,
             mfid integer,
             size integer,
-            basePrice integer
+            basePrice integer,
+            pQuantity integer
           )
         ''');
 
@@ -90,6 +93,7 @@ class DBCreation {
           )
         ''');// Point 4
         
+        //  Point 5
         //  Employee
         await db.execute('''
           create table Employee (
@@ -97,7 +101,29 @@ class DBCreation {
             eEmail text,
             ePhoneNumber text,
             eName text,
-            ePassword text
+            ePassword text,
+            eRole text
+          )
+        ''');
+
+        //  PurchaseItem
+        await db.execute('''
+          create table PurchaseItem (
+            id integer primary key autoincrement,
+            pid integer,
+            pcQuantity integer
+          )
+        ''');
+        //  LoginHistory
+        await db.execute('''
+          create table LoginHistory (
+            id integer primary key autoincrement,
+            cid integer,
+            loginTime text,
+            lStatus text,
+            lVersion REAL,
+            lAddress text,
+            lPaymentMethod text
           )
         ''');
       },

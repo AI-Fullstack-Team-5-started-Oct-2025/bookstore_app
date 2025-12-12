@@ -102,6 +102,7 @@ class _DetailViewState extends State<DetailView> {
       mfid: dManufacturer.id,
       size: 250,
       basePrice: 10500,
+      pQuantity: 5
     );
     dProduct.id = await productDAO.insertK(dProduct.toMap());
     product = (await productDAO.queryK({'id': dProduct.id})).first;
