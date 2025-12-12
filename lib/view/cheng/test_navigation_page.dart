@@ -22,7 +22,7 @@ class TestNavigationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: '네비게이션 테스트', centerTitle: true),
+      appBar: CustomAppBar(title: '네비게이션 테스트', centerTitle: true, titleTextStyle: config.rLabel),
       body: SafeArea(
         child: SingleChildScrollView(
           child: CustomPadding(

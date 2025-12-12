@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../config.dart' as config;
 import 'custom/custom.dart';
 import 'customer_sub_dir/customer_info_card.dart';
 import 'employee_sub_dir/order_utils.dart';
@@ -58,6 +59,7 @@ class OrderDetailScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: '주문 상세',
         centerTitle: true,
+        titleTextStyle: config.rLabel,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

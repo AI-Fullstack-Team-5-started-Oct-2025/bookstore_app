@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../config.dart' as config;
 import 'custom/custom.dart';
 import 'customer_sub_dir/customer_return_card.dart';
 import 'return_detail_screen.dart';
@@ -72,6 +73,7 @@ class _ReturnListScreenState extends State<ReturnListScreen> {
       appBar: CustomAppBar(
         title: '수령 완료 목록',
         centerTitle: true,
+        titleTextStyle: config.rLabel,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
