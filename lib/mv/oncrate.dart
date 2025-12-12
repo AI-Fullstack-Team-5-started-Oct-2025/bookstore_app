@@ -84,7 +84,7 @@ class DBCreation {
             id integer primary key autoincrement,
             cEmail text,
             cPhoneNumber text,
-            cPname text,
+            cName text,
             cPassword text
           )
         ''');
