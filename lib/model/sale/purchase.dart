@@ -17,9 +17,9 @@ class Purchase {
   int? id;
   //  Point 1
   int? cid; //  Customer id
-  final String pickupDate;
-  final String orderCode;
-  final String timeStamp;
+  final String pickupDate;  //  Pickupdate default is Purchasedate +1 dummy for now
+  final String orderCode; //  Client's request
+  final String timeStamp; //  Purchased time
 
   // Constructor
   Purchase({
