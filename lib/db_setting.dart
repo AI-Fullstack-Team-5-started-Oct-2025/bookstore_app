@@ -1036,31 +1036,31 @@ class DbSetting {
       rows: [
         {
           'cid': 1,
-          'pickupDate': '2025-12-14 07:20',
+          'pickupDate': '2025-12-13 07:20',
           'orderCode': 'orderCode',
           'timeStamp': '2025-12-12 07:20',
         },
         {
           'cid': 1,
-          'pickupDate': '2025-12-14 07:20',
+          'pickupDate': '2025-12-13 07:20',
           'orderCode': 'orderCode',
           'timeStamp': '2025-12-12 07:20',
         },
         {
           'cid': 1,
-          'pickupDate': '2025-12-14 07:20',
+          'pickupDate': '2025-12-13 07:20',
           'orderCode': 'orderCode',
           'timeStamp': '2025-12-12 07:20',
         },
         {
           'cid': 1,
-          'pickupDate': '2025-12-14 07:20',
+          'pickupDate': '2025-12-13 07:20',
           'orderCode': 'orderCode',
           'timeStamp': '2025-12-12 07:20',
         },
         {
           'cid': 1,
-          'pickupDate': '2023-12-14 07:20',
+          'pickupDate': '2023-12-13 07:20',
           'orderCode': 'orderCode',
           'timeStamp': '2023-12-12 07:20',
         },
@@ -1070,12 +1070,12 @@ class DbSetting {
     TableBatch purchaseItemBatch = TableBatch(
       tableName: 'PurchaseItem',
       rows: [
-        {'pid': 1, 'pcid': 1, 'pcQuantity': 10, 'pcStatus': '결제 대기'},
-        {'pid': 2, 'pcid': 2, 'pcQuantity': 3, 'pcStatus': '결제 대기'},
-        {'pid': 3, 'pcid': 2, 'pcQuantity': 6, 'pcStatus': '결제 대기'},
-        {'pid': 4, 'pcid': 3, 'pcQuantity': 1, 'pcStatus': '결제 대기'},
-        {'pid': 5, 'pcid': 4, 'pcQuantity': 9, 'pcStatus': '결제 대기'},
-        {'pid': 6, 'pcid': 5, 'pcQuantity': 11, 'pcStatus': '결제 대기'},
+        {'pid': 1, 'pcid': 1, 'pcQuantity': 10, 'pcStatus': '제품 준비 완료'},
+        {'pid': 2, 'pcid': 2, 'pcQuantity': 3, 'pcStatus': '제품 준비 완료'},
+        {'pid': 3, 'pcid': 2, 'pcQuantity': 6, 'pcStatus': '제품 준비 완료'},
+        {'pid': 4, 'pcid': 3, 'pcQuantity': 1, 'pcStatus': '제품 준비 완료'},
+        {'pid': 5, 'pcid': 4, 'pcQuantity': 9, 'pcStatus': '제품 준비 완료'},
+        {'pid': 6, 'pcid': 5, 'pcQuantity': 11, 'pcStatus': '제품 준비 완료'},
       ],
     );
 
