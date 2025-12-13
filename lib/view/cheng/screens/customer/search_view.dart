@@ -1,6 +1,11 @@
 // Flutter imports
+import 'package:bookstore_app/Restitutor_custom/dao_custom.dart';
+import 'package:bookstore_app/model/product/manufacturer.dart';
+import 'package:bookstore_app/model/product/product.dart';
+import 'package:bookstore_app/model/product/product_base.dart';
+import 'package:bookstore_app/model/product/product_image.dart';
 import 'package:flutter/material.dart';
-
+import 'package:bookstore_app/config.dart' as config;
 // Third-party package imports
 import 'package:get/get.dart';
 
@@ -27,17 +32,22 @@ import '../auth/login_view.dart';
   Stored DateTime in String MUST converted using DateTime.parse(value);
 */
 
-class Product {
+class ProductInstance {
   final String name;
   final String manufacturer;
   final int price;
   final String imageUrl;
+  final int pbid;
+  final int mfid;
 
-  Product({
+
+  ProductInstance({
     required this.name,
     required this.manufacturer,
     required this.price,
     required this.imageUrl,
+    required this.pbid,
+    required this.mfid
   });
 }
 
@@ -54,41 +64,44 @@ class _SearchViewState extends State<SearchView> {
   String _userEmail = '이메일 없음';
   
   // Dummy
-  final List<Product> _allProducts = [
-    Product(
-      name: 'Nikke',
-      manufacturer: 'Resti NB',
-      price: 129000,
-      imageUrl:
-          'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg',
-    ),
-    Product(
-      name: 'Hebi.',
-      manufacturer: 'Resti Nike',
-      price: 159000,
-      imageUrl:
-          'https://images.pexels.com/photos/1032110/pexels-photo-1032110.jpeg',
-    ),
-    Product(
-      name: 'Restitutor',
-      manufacturer: 'Shoe King',
-      price: 199000,
-      imageUrl:
-          'https://images.pexels.com/photos/2529147/pexels-photo-2529147.jpeg',
-    ),
-  ];
+  // final List<Product> _allProducts = [
+  //   Product(
+  //     name: 'Nikke',
+  //     manufacturer: 'Resti NB',
+  //     price: 129000,
+  //     imageUrl:
+  //         'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg',
+  //   ),
+  //   Product(
+  //     name: 'Hebi.',
+  //     manufacturer: 'Resti Nike',
+  //     price: 159000,
+  //     imageUrl:
+  //         'https://images.pexels.com/photos/1032110/pexels-photo-1032110.jpeg',
+  //   ),
+  //   Product(
+  //     name: 'Restitutor',
+  //     manufacturer: 'Shoe King',
+  //     price: 199000,
+  //     imageUrl:
+  //         'https://images.pexels.com/photos/2529147/pexels-photo-2529147.jpeg',
+  //   ),
+  // ];
 
-  late List<Product> _filteredProducts;
+  // late List<Product> _filteredProducts;
   final TextEditingController _searchController = TextEditingController();
-
+late List<ProductInstance> _allProducts;
+  late List<ProductInstance> _filteredProducts;
   @override
   void initState() {
     super.initState();
-    _filteredProducts = List.from(_allProducts);
-    
+    // _filteredProducts = List.from(_allProducts);
+    _allProducts = [];
+    _filteredProducts = [];
     // 사용자 정보 로드
     _loadUserInfo();
     
+        loadProductData();
     // 디버깅: 저장된 사용자 정보 확인
     // get_storage가 비동기적으로 초기화될 수 있으므로 약간의 지연 후 확인
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -129,6 +142,74 @@ class _SearchViewState extends State<SearchView> {
     } catch (e) {
       print('사용자 정보 로드 에러: $e');
     }
+  }
+
+  Future  loadProductData() async
+  {
+
+
+    final manufacturerDAO = RDAO<Manufacturer>(
+      dbName: dbName,
+      tableName: config.kTableManufacturer,
+      dVersion: dVersion,
+      fromMap: Manufacturer.fromMap,
+    );
+    final productDAO = RDAO<Product>(
+      dbName: dbName,
+      tableName: config.kTableProduct,
+      dVersion: dVersion,
+      fromMap: Product.fromMap,
+    );
+
+    final productBaseDAO = RDAO<ProductBase>(
+      dbName: dbName,
+      tableName: config.kTableProductBase,
+      dVersion: dVersion,
+      fromMap: ProductBase.fromMap,
+    );
+
+    final productImageDAO = RDAO<ProductImage>(
+      dbName: dbName,
+      tableName: config.kTableProductImage,
+      dVersion: dVersion,
+      fromMap: ProductImage.fromMap,
+    );
+
+    var manufacturerList = await manufacturerDAO.queryAll();
+    var productList = await productDAO.queryAll();
+    var productBaseList = await productBaseDAO.queryAll();
+    var productImageList = await productImageDAO.queryAll();
+
+    for(var item in productList)
+    {
+      ProductInstance instace = ProductInstance(
+        name: productBaseList[item.pbid! -1].pName, 
+        manufacturer: manufacturerList[item.mfid! -1].mName, 
+        price: item.basePrice, 
+        imageUrl: productImageList[(item.pbid! - 1) * 3].imagePath,
+        pbid: item.pbid! - 1,
+        mfid: item.mfid! -1);  
+        bool isHas = false;
+        if(_allProducts.isNotEmpty)
+        {
+          for(var inst in _allProducts)
+          {
+            if(inst.pbid == item.pbid! -1)
+            {
+              isHas = true;
+              break;
+            }
+          }
+        }
+        if(isHas == false)
+        {
+          _allProducts.add(instace);
+        }
+    }
+    setState(() {
+    _filteredProducts = List.from(_allProducts);
+  });
+
   }
 
   void _onSearchChanged(String keyword) {
@@ -196,7 +277,9 @@ class _SearchViewState extends State<SearchView> {
 
           // 🥿 상품 카드 2열 그리드
           Expanded(
-            child: GridView.builder(
+            child: _filteredProducts.isEmpty
+            ? Center(child: CircularProgressIndicator())
+            :GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,      // 한 줄에 2개
@@ -338,7 +421,7 @@ class _SearchViewState extends State<SearchView> {
 */
 
 class _ProductCard extends StatelessWidget {
-  final Product product;
+  final ProductInstance product;
 
   const _ProductCard({required this.product});
 
@@ -356,7 +439,7 @@ class _ProductCard extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(
+                child: Image.asset(
                   product.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
