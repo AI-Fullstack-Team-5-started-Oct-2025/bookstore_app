@@ -7,6 +7,7 @@
     11/29/2025 17:52, 'Point 2, Price format preset', Creator: Chansol, Park
     12/12/2025 15:55, 'Point 3, PurchaseItem, LoginHistory table added', Creator: Chansol, Park
     12/12/2025 15:55, 'Point 4, pickupStatus, returnStatus, loginStatus, district added', Creator: zero
+    13/12/2025 13:49, 'Point 5, Retail Model configuration added', Creator: Chansol Park
   Version: 1.0
   Desc: Config for dbName, version, etc.
 */
@@ -67,6 +68,8 @@ const String tTableEmployee = 'Employee';
 //  Point 3
 const String kTableLoginHistory = 'LoginHistory';
 const String kTablePurchaseItem = 'PurchaseItem';
+//  Point 5
+const String kTableRetail = 'Retail';
 
 
 //  Routes
