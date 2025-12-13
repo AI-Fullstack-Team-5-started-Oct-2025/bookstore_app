@@ -15,45 +15,45 @@ import '../../custom/custom.dart';
 
 // Local imports - Widgets
 import '../customer/customer_info_card.dart';
+
+// Local imports - Utils
 import '../../utils/order_utils.dart';
 import '../../utils/order_status_colors.dart';
 
-/// 반품 주문 상품 정보를 담는 클래스
-class ReturnItemInfo {
+/// 주문 상품 정보를 담는 클래스
+class OrderItemInfo {
   final String productName;
   final int size;
   final String color;
   final int quantity;
   final int price;
-  final String returnStatus; // 반품 상태 (pcStatus 기반)
 
-  ReturnItemInfo({
+  OrderItemInfo({
     required this.productName,
     required this.size,
     required this.color,
     required this.quantity,
     required this.price,
-    required this.returnStatus,
   });
 }
 
-/// 반품 주문 상세 정보 뷰
-/// 반품 관리 화면의 우측에 표시되는 반품 주문 상세 정보를 보여주는 위젯입니다.
-/// 주문자 정보, 반품 상품 목록을 포함합니다. (읽기 전용)
-class ReturnOrderDetailView extends StatefulWidget {
+/// 관리자용 주문 상세 정보 뷰
+/// 주문 관리 화면의 우측에 표시되는 주문 상세 정보를 보여주는 위젯입니다.
+/// 읽기 전용으로, 버튼은 비활성화되어 있습니다.
+class AdminOrderDetailView extends StatefulWidget {
   /// 주문 ID (Purchase id)
   final int purchaseId;
 
-  const ReturnOrderDetailView({
+  const AdminOrderDetailView({
     super.key,
     required this.purchaseId,
   });
 
   @override
-  State<ReturnOrderDetailView> createState() => _ReturnOrderDetailViewState();
+  State<AdminOrderDetailView> createState() => _AdminOrderDetailViewState();
 }
 
-class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
+class _AdminOrderDetailViewState extends State<AdminOrderDetailView> {
   /// 로딩 상태
   bool _isLoading = true;
 
@@ -64,10 +64,10 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
   Customer? _customer;
 
   /// 주문 상품 목록
-  List<ReturnItemInfo> _orderItems = [];
+  List<OrderItemInfo> _orderItems = [];
 
-  /// 반품 상태 (반품 가능 / 반품 불가)
-  String _returnStatus = '반품 불가';
+  /// 주문 상태
+  String _orderStatus = '';
 
   /// DAO 인스턴스들
   late final RDAO<Purchase> _purchaseDao;
@@ -113,22 +113,23 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
   }
 
   @override
-  void didUpdateWidget(ReturnOrderDetailView oldWidget) {
+  void didUpdateWidget(AdminOrderDetailView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // purchaseId가 변경되면 데이터 다시 로드
+    // purchaseId가 변경되면 데이터를 다시 로드
     if (oldWidget.purchaseId != widget.purchaseId) {
       _loadOrderDetail();
     }
   }
 
   /// DB에서 주문 상세 정보를 불러오는 함수
+  /// 관리자는 모든 주문을 볼 수 있습니다.
   Future<void> _loadOrderDetail() async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      AppLogger.d('=== 관리자 반품 상세 조회 시작 ===');
+      AppLogger.d('=== 관리자 주문 상세 조회 시작 ===');
       AppLogger.d('주문 ID (Purchase id): ${widget.purchaseId}');
 
       // 주문 정보 조회 (Purchase id로)
@@ -143,6 +144,15 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
 
       final purchase = purchases.first;
       AppLogger.d('주문 조회 성공: id=${purchase.id}, cid=${purchase.cid}, orderCode=${purchase.orderCode}');
+      
+      // Purchase 상세 정보 로그 출력
+      AppLogger.d('=== Purchase 상세 정보 ===');
+      AppLogger.d('Purchase ID: ${purchase.id}');
+      AppLogger.d('Customer ID (cid): ${purchase.cid}');
+      AppLogger.d('Order Code: ${purchase.orderCode}');
+      AppLogger.d('Pickup Date: ${purchase.pickupDate}');
+      AppLogger.d('Time Stamp: ${purchase.timeStamp}');
+      AppLogger.d('=' * 50);
 
       // 고객 정보 조회
       if (purchase.cid != null) {
@@ -161,10 +171,24 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
         final purchaseItems = await _purchaseItemDao.queryK({'pcid': purchase.id});
         AppLogger.d('=== PurchaseItem 조회 결과 ===');
         AppLogger.d('조회된 PurchaseItem 개수: ${purchaseItems.length}');
+        AppLogger.d('=' * 50);
+        
+        // 각 PurchaseItem 상세 정보 로그 출력
+        for (var i = 0; i < purchaseItems.length; i++) {
+          final item = purchaseItems[i];
+          AppLogger.d('--- PurchaseItem[$i] 상세 정보 ---');
+          AppLogger.d('  PurchaseItem ID: ${item.id}');
+          AppLogger.d('  Product ID (pid): ${item.pid}');
+          AppLogger.d('  Purchase ID (pcid): ${item.pcid}');
+          AppLogger.d('  Quantity (pcQuantity): ${item.pcQuantity}');
+          AppLogger.d('  Status (pcStatus): "${item.pcStatus}"');
+          AppLogger.d('-' * 50);
+        }
+        AppLogger.d('=' * 50);
 
         // 상품 정보 조회 및 조합
         // 같은 제품(pid, size, color)은 수량을 합쳐서 하나의 카드로 표시
-        final orderItemsMap = <String, ReturnItemInfo>{}; // key: "pid_size_color"
+        final orderItemsMap = <String, OrderItemInfo>{}; // key: "pid_size_color"
         final processedItemIds = <int>{}; // 중복 확인용 (PurchaseItem ID 기준)
 
         for (var i = 0; i < purchaseItems.length; i++) {
@@ -200,54 +224,32 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
               }
               final productBase = productBases.first;
 
-              // 반품 상태 결정 (pcStatus 기반)
-              final statusNum = _parseStatusToNumber(item.pcStatus);
-              String returnStatusText;
-              if (statusNum >= 3) {
-                // 반품 신청 이상 (3, 4, 5)
-                returnStatusText = config.pickupStatus[statusNum] ?? '반품 신청';
-              } else {
-                // 반품 신청 가능 (2: 제품 수령 완료)
-                returnStatusText = '반품 신청';
-              }
-
               // 같은 제품(pid, size, color)을 구분하는 키 생성
               final itemKey = '${item.pid}_${product.size}_${productBase.pColor}';
 
               if (orderItemsMap.containsKey(itemKey)) {
                 // 이미 같은 제품이 있으면 수량만 합산
                 final existingItem = orderItemsMap[itemKey]!;
-                // 같은 제품이 여러 PurchaseItem으로 나뉘어 있을 수 있으므로
-                // 가장 높은 반품 상태를 유지 (반품 완료 > 반품 처리 중 > 반품 신청)
-                final existingStatusNum = _parseStatusToNumber(existingItem.returnStatus);
-                final currentStatusNum = _parseStatusToNumber(item.pcStatus);
-                final higherStatusNum = existingStatusNum > currentStatusNum ? existingStatusNum : currentStatusNum;
-                final higherStatusText = higherStatusNum >= 3
-                    ? (config.pickupStatus[higherStatusNum] ?? '반품 신청')
-                    : '반품 신청';
-
-                final updatedItem = ReturnItemInfo(
+                final updatedItem = OrderItemInfo(
                   productName: existingItem.productName,
                   size: existingItem.size,
                   color: existingItem.color,
                   quantity: existingItem.quantity + item.pcQuantity, // 수량 합산
                   price: existingItem.price,
-                  returnStatus: higherStatusText,
                 );
                 orderItemsMap[itemKey] = updatedItem;
-                AppLogger.d('기존 ReturnItem 수량 합산: ${existingItem.productName}, 기존 수량=${existingItem.quantity}, 추가 수량=${item.pcQuantity}, 총 수량=${updatedItem.quantity}');
+                AppLogger.d('기존 OrderItem 수량 합산: ${existingItem.productName}, 기존 수량=${existingItem.quantity}, 추가 수량=${item.pcQuantity}, 총 수량=${updatedItem.quantity}');
               } else {
                 // 새로운 제품이면 추가
-                final returnItem = ReturnItemInfo(
+                final orderItem = OrderItemInfo(
                   productName: productBase.pName,
                   size: product.size,
                   color: productBase.pColor,
                   quantity: item.pcQuantity,
                   price: product.basePrice,
-                  returnStatus: returnStatusText,
                 );
-                orderItemsMap[itemKey] = returnItem;
-                AppLogger.d('ReturnItem 추가: ${returnItem.productName}, 사이즈=${returnItem.size}, 색상=${returnItem.color}, 수량=${returnItem.quantity}, 가격=${returnItem.price}, 반품상태=${returnItem.returnStatus}');
+                orderItemsMap[itemKey] = orderItem;
+                AppLogger.d('OrderItem 추가: ${orderItem.productName}, 사이즈=${orderItem.size}, 색상=${orderItem.color}, 수량=${orderItem.quantity}, 가격=${orderItem.price}');
               }
             }
           } catch (e) {
@@ -260,71 +262,73 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
 
         AppLogger.d('=== 최종 결과 ===');
         AppLogger.d('PurchaseItem 개수: ${purchaseItems.length}');
-        AppLogger.d('ReturnItem 개수: ${orderItemsList.length}');
+        AppLogger.d('OrderItem 개수: ${orderItemsList.length}');
         AppLogger.d('처리된 PurchaseItem ID: $processedItemIds');
 
-        // 반품 가능 여부 결정
-        final returnStatus = _determineReturnStatus(purchaseItems, purchase);
+        // 주문 상태 결정 (DB에 저장된 PurchaseItem 상태 기반)
+        final orderStatus = _determineOrderStatus(purchaseItems, purchase);
+
+        AppLogger.d('주문 상태: $orderStatus');
 
         setState(() {
           _purchase = purchase;
           _orderItems = orderItemsList;
-          _returnStatus = returnStatus;
+          _orderStatus = orderStatus;
           _isLoading = false;
         });
       }
     } catch (e, stackTrace) {
-      AppLogger.e('반품 상세 로드 실패', error: e, stackTrace: stackTrace);
+      AppLogger.e('주문 상세 로드 실패', error: e, stackTrace: stackTrace);
       setState(() {
         _isLoading = false;
       });
     }
   }
 
-  /// 반품 가능 여부를 결정하는 함수
-  /// 하나라도 반품 가능하면 "반품 가능", 모두 반품 완료되면 "반품 불가" 반환
-  String _determineReturnStatus(List<PurchaseItem> items, Purchase purchase) {
+  /// PurchaseItem 목록을 기반으로 주문 전체 상태를 결정하는 함수
+  /// 관리자 화면에서는 실제 상태를 그대로 표시 (고객 화면과 달리 변환하지 않음)
+  String _determineOrderStatus(List<PurchaseItem> items, Purchase purchase) {
     if (items.isEmpty) {
-      return '반품 불가';
+      return config.pickupStatus[0] ?? '제품 준비 중';
     }
 
-    final pickupDate = DateTime.tryParse(purchase.pickupDate);
-    final now = DateTime.now();
-    bool hasReturnableItem = false;
-    bool allReturnCompleted = true;
+    // 모든 아이템의 상태를 숫자로 변환
+    final statusNumbers = items.map((item) => _parseStatusToNumber(item.pcStatus)).toList();
 
-    for (final item in items) {
-      final statusNum = _parseStatusToNumber(item.pcStatus);
+    // 반품 상태(3 이상)가 있는지 확인
+    final hasReturnStatus = statusNumbers.any((status) => status >= 3);
 
-      // 반품 완료(5)가 아닌 경우 allReturnCompleted를 false로 설정
-      if (statusNum != 5) {
-        allReturnCompleted = false;
-      }
-
-      // 반품 가능 조건: 상태가 2 (제품 수령 완료)이고 30일이 지나지 않았으면 반품 가능
-      if (statusNum == 2) {
-        if (pickupDate != null) {
-          final daysDifference = now.difference(pickupDate).inDays;
-          if (daysDifference < 30) {
-            // 반품 가능한 아이템이 하나라도 있으면
-            hasReturnableItem = true;
-          }
+    // 30일 경과 확인 (반품 상태가 아닌 경우에만 적용)
+    if (!hasReturnStatus) {
+      final pickupDate = DateTime.tryParse(purchase.pickupDate);
+      if (pickupDate != null) {
+        final daysDifference = DateTime.now().difference(pickupDate).inDays;
+        if (daysDifference >= 30) {
+          return config.pickupStatus[2] ?? '제품 수령 완료';
         }
       }
     }
 
-    // 모든 아이템이 반품 완료(5)이면 "반품 불가"
-    if (allReturnCompleted) {
-      return '반품 불가';
+    // 모든 아이템이 같은 상태인지 확인
+    final firstStatus = statusNumbers.first;
+    final allSameStatus = statusNumbers.every((status) => status == firstStatus);
+
+    // 상태 결정: 실제 상태를 그대로 반환 (관리자는 실제 상태를 확인해야 함)
+    int displayStatus;
+    if (allSameStatus) {
+      displayStatus = firstStatus;
+    } else {
+      // 상태가 다르면 가장 낮은 상태를 반환 (보수적 접근)
+      displayStatus = statusNumbers.reduce((a, b) => a < b ? a : b);
     }
 
-    // 하나라도 반품 가능한 아이템이 있으면 "반품 가능"
-    if (hasReturnableItem) {
-      return '반품 가능';
+    // 실제 상태를 그대로 반환 (관리자 화면에서는 변환하지 않음)
+    if (displayStatus >= 0 && displayStatus <= 5) {
+      return config.pickupStatus[displayStatus] ?? '제품 준비 중';
     }
 
-    // 그 외의 경우 (반품 신청, 반품 처리 중, 30일 경과 등) "반품 불가"
-    return '반품 불가';
+    // 기본값: 제품 준비 중
+    return config.pickupStatus[0] ?? '제품 준비 중';
   }
 
   /// pcStatus를 숫자로 파싱하는 함수
@@ -356,18 +360,16 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Center(
-        child: CircularProgressIndicator(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 32),
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
     if (_purchase == null || _customer == null) {
-      return Center(
-        child: CustomText(
-          '주문 정보를 불러올 수 없습니다.',
-          fontSize: 14,
-          fontWeight: FontWeight.normal,
-          textAlign: TextAlign.center,
-        ),
+      return const Center(
+        child: Text('주문 정보를 불러올 수 없습니다.'),
       );
     }
 
@@ -377,11 +379,26 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
       (sum, item) => sum + (item.price * item.quantity),
     );
 
+    // 상태에 따라 버튼 텍스트 결정
+    // 관리자 화면은 읽기 전용이므로 상태에 맞는 텍스트를 표시
+    // 제품 준비 완료 상태일 때만 "픽업 준비 완료", 그 외에는 현재 상태 표시
+    String buttonText;
+    final statusNum = _parseStatusToNumber(_orderStatus);
+    if (statusNum == 1) {
+      // 제품 준비 완료 상태: 픽업 준비 완료 버튼 (비활성화) - 관리자 관점
+      buttonText = '픽업 준비 완료';
+    } else {
+      // 그 외 상태: 현재 상태 텍스트 표시 (제품 수령 완료, 제품 준비 중, 반품 신청 등)
+      buttonText = _orderStatus;
+    }
+    
+    AppLogger.d('버튼 텍스트 결정: orderStatus="$_orderStatus", statusNum=$statusNum, buttonText="$buttonText"');
+
     return CustomColumn(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16,
       children: [
-        // 주문 ID 표시 및 반품 상태
+        // 주문 ID 및 상태 표시
         CustomCard(
           padding: const EdgeInsets.all(16),
           child: CustomRow(
@@ -392,18 +409,18 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
-              // 반품 상태 배지
+              // 주문 상태 배지
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: OrderStatusColors.getStatusColor(_returnStatus),
+                  color: OrderStatusColors.getStatusColor(_orderStatus),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomText(
-                  _returnStatus,
+                  _orderStatus,
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
                   color: Colors.white,
@@ -420,17 +437,13 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
           email: _customer!.cEmail,
         ),
 
-        // 반품 상품들 제목
-        CustomText(
-          '반품 상품들',
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
+        // 주문 상품들 제목
+        CustomText('주문 상품들', fontSize: 18, fontWeight: FontWeight.bold),
 
-        // 반품 상품 리스트 (각 상품을 카드로 표시, 읽기 전용)
+        // 주문 상품 리스트 (각 상품을 카드로 표시)
         if (_orderItems.isEmpty)
           CustomText(
-            '반품 상품이 없습니다.',
+            '주문 상품이 없습니다.',
             fontSize: 14,
             fontWeight: FontWeight.normal,
             textAlign: TextAlign.center,
@@ -440,109 +453,96 @@ class _ReturnOrderDetailViewState extends State<ReturnOrderDetailView> {
             return CustomCard(
               margin: const EdgeInsets.only(bottom: 8),
               padding: const EdgeInsets.all(12),
-              child: CustomColumn(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 8,
+              child: CustomRow(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // 상품명
-                  CustomText(
-                    item.productName,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  // 상품명 (가장 넓은 영역)
+                  Expanded(
+                    flex: 2,
+                    child: CustomText(
+                      item.productName,
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                  // 상품 정보 (사이즈, 색상, 수량)
-                  CustomRow(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: CustomText(
-                          '사이즈: ${item.size} | 색상: ${item.color} | 수량: ${item.quantity}',
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      // 가격 표시 (오른쪽 정렬)
-                      CustomText(
-                        '${formatPrice(item.price * item.quantity)}원',
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue.shade700,
-                      ),
-                    ],
+                  // 사이즈 표시
+                  SizedBox(
+                    width: 60,
+                    child: CustomText(
+                      '${item.size}',
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                  // 반품 상태 표시 (읽기 전용 - 관리자 화면)
-                  // 30일 경과 시 회색으로 표시, 그 외에는 상태에 따른 색상
-                  Builder(
-                    builder: (context) {
-                      // 반품 상태 확인
-                      final statusNum = _parseStatusToNumber(item.returnStatus);
-                      final isReturnCompleted = statusNum == 5; // 반품 완료
-                      
-                      // 상태 텍스트 결정: 반품 완료가 아니면 "반품 신청"
-                      final statusText = isReturnCompleted 
-                          ? (config.pickupStatus[5] ?? '반품 완료')
-                          : '반품 신청';
-                      
-                      // pickupDate로부터 30일 경과 확인
-                      bool is30DaysPassed = false;
-                      if (_purchase != null) {
-                        final pickupDate = DateTime.tryParse(_purchase!.pickupDate);
-                        if (pickupDate != null) {
-                          final daysDifference = DateTime.now().difference(pickupDate).inDays;
-                          is30DaysPassed = daysDifference >= 30;
-                        }
-                      }
-                      
-                      // 30일 경과 시 회색으로 표시, 그 외에는 상태에 따른 색상
-                      final statusColor = (is30DaysPassed && !isReturnCompleted)
-                          ? Colors.grey.shade400
-                          : OrderStatusColors.getStatusColor(statusText);
-                      
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: CustomText(
-                          statusText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                        ),
-                      );
-                    },
+                  // 색상 표시
+                  SizedBox(
+                    width: 60,
+                    child: CustomText(
+                      item.color,
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  // 수량 표시
+                  SizedBox(
+                    width: 40,
+                    child: CustomText(
+                      '${item.quantity}',
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  // 가격 표시 (오른쪽 정렬)
+                  SizedBox(
+                    width: 100,
+                    child: CustomText(
+                      '${formatPrice(item.price * item.quantity)}원',
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      textAlign: TextAlign.right,
+                    ),
                   ),
                 ],
               ),
             );
           }),
 
-        // 총 주문 금액 표시 카드
-        CustomCard(
-          padding: const EdgeInsets.all(16),
-          child: CustomRow(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CustomText(
-                '총 주문 금액',
+        // 총 가격 표시 (오른쪽 정렬)
+        CustomRow(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            CustomText(
+              '총 가격: ${formatPrice(totalPrice)}원',
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ],
+        ),
+
+        // 픽업 완료 버튼 (읽기 전용 - 비활성화)
+        IgnorePointer(
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade400,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Center(
+              child: CustomText(
+                buttonText,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
+                color: Colors.white70,
               ),
-              CustomText(
-                '${formatPrice(totalPrice)}원',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue.shade700,
-              ),
-            ],
+            ),
           ),
         ),
       ],
     );
   }
 }
+

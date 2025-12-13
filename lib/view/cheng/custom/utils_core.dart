@@ -37,3 +37,6 @@ export 'util/timer/custom_timer_util.dart';
 
 // 네비게이션 유틸리티 (Flutter Navigator 래핑)
 export 'util/navigation/custom_navigation_util.dart';
+
+// 로그 유틸리티 (순수 Dart, 의존성 없음)
+export 'util/log/custom_log_util.dart';

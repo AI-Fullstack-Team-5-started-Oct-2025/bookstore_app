@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../custom/custom.dart';
+import '../../utils/order_status_colors.dart';
 
 /// 주문 카드 기본 위젯
 /// 주문 관리와 반품 관리 화면에서 공통으로 사용하는 카드 구조를 제공하는 베이스 클래스입니다.
@@ -45,11 +46,19 @@ class BaseOrderCard extends StatelessWidget {
               children: [
                 // 주문 ID (굵은 글씨)
                 CustomText(orderId, fontSize: 14, fontWeight: FontWeight.bold),
-                // 주문 상태 (작은 글씨)
-                CustomText(
+                // 주문 상태 (배지 형태로 표시)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: OrderStatusColors.getStatusColor(orderStatus),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: CustomText(
                   orderStatus,
                   fontSize: 12,
                   fontWeight: FontWeight.normal,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),
