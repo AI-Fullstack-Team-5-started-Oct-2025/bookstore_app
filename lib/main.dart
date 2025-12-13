@@ -2,11 +2,11 @@ import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncreate.dart';
 import 'package:bookstore_app/view/cheng/screens/auth/login_view.dart';
+import 'package:bookstore_app/view/cheng/screens/customer/search_view.dart';
 import 'package:bookstore_app/view/customer/address_payment_view.dart';
 import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
 import 'package:bookstore_app/view/customer/purchase_view.dart';
-import 'package:bookstore_app/view/customer/search_view.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

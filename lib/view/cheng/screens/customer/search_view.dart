@@ -25,6 +25,8 @@ import '../auth/login_view.dart';
   Create: 12/12/2025 11:44, Creator: Chansol, Park
   Update log: 
     DUMMY 00/00/0000 00:00, 'Point X, Description', Creator: Chansol, Park
+    13/12/2025 16:47, 'Point 1, Clicking card Get.toNamed -> DetailView', Creator: Chansol Park
+    13/12/2025 17:18, 'Point 2, Card will show ProductBase instead of Product, Assembly based on pbid', Creator: Chansol Park
   Version: 1.0
   Desc: SearchView page
 
@@ -32,24 +34,23 @@ import '../auth/login_view.dart';
   Stored DateTime in String MUST converted using DateTime.parse(value);
 */
 
-class ProductInstance {
-  final String name;
-  final String manufacturer;
-  final int price;
-  final String imageUrl;
-  final int pbid;
-  final int mfid;
+// class ProductInstance {
+//   final String name;
+//   final String manufacturer;
+//   final int price;
+//   final String imageUrl;
+//   final int pbid;
+//   final int mfid;
 
-
-  ProductInstance({
-    required this.name,
-    required this.manufacturer,
-    required this.price,
-    required this.imageUrl,
-    required this.pbid,
-    required this.mfid
-  });
-}
+//   ProductInstance({
+//     required this.name,
+//     required this.manufacturer,
+//     required this.price,
+//     required this.imageUrl,
+//     required this.pbid,
+//     required this.mfid
+//   });
+// }
 
 class SearchView extends StatefulWidget {
   const SearchView({super.key});
@@ -59,10 +60,37 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
+  //  DBHandlers
+  final manufacturerDAO = RDAO<Manufacturer>(
+    dbName: dbName,
+    tableName: config.kTableManufacturer,
+    dVersion: dVersion,
+    fromMap: Manufacturer.fromMap,
+  );
+  final productDAO = RDAO<Product>(
+    dbName: dbName,
+    tableName: config.kTableProduct,
+    dVersion: dVersion,
+    fromMap: Product.fromMap,
+  );
+
+  final productBaseDAO = RDAO<ProductBase>(
+    dbName: dbName,
+    tableName: config.kTableProductBase,
+    dVersion: dVersion,
+    fromMap: ProductBase.fromMap,
+  );
+
+  final productImageDAO = RDAO<ProductImage>(
+    dbName: dbName,
+    tableName: config.kTableProductImage,
+    dVersion: dVersion,
+    fromMap: ProductImage.fromMap,
+  );
   // 사용자 정보를 저장할 변수
   String _userName = '사용자';
   String _userEmail = '이메일 없음';
-  
+
   // Dummy
   // final List<Product> _allProducts = [
   //   Product(
@@ -90,18 +118,22 @@ class _SearchViewState extends State<SearchView> {
 
   // late List<Product> _filteredProducts;
   final TextEditingController _searchController = TextEditingController();
-late List<ProductInstance> _allProducts;
-  late List<ProductInstance> _filteredProducts;
+  List<ProductBase>? _allPBs; //  Entire PB
+  List<ProductBase>? _filteredPBs; //  Searched PB
+
+  Map<int, Product> _prodMap = {}; // pbid -> Product
+  Map<int, Manufacturer> _mfMap = {}; // mfid -> Manufacturer
+
+  Map<int, ProductImage> _imgMap = {}; // pbid -> ProductImage
+  bool _loading = true;
+
   @override
   void initState() {
     super.initState();
     // _filteredProducts = List.from(_allProducts);
-    _allProducts = [];
-    _filteredProducts = [];
     // 사용자 정보 로드
     _loadUserInfo();
-    
-        loadProductData();
+    loadProductData();
     // 디버깅: 저장된 사용자 정보 확인
     // get_storage가 비동기적으로 초기화될 수 있으므로 약간의 지연 후 확인
     Future.delayed(const Duration(milliseconds: 200), () {
@@ -144,86 +176,82 @@ late List<ProductInstance> _allProducts;
     }
   }
 
-  Future  loadProductData() async
-  {
+  Future<void> loadProductData() async {
+    setState(() => _loading = true);
 
+    // 1) ProductBase 전부
+    final pbs = await productBaseDAO.queryAll();
 
-    final manufacturerDAO = RDAO<Manufacturer>(
-      dbName: dbName,
-      tableName: config.kTableManufacturer,
-      dVersion: dVersion,
-      fromMap: Manufacturer.fromMap,
-    );
-    final productDAO = RDAO<Product>(
-      dbName: dbName,
-      tableName: config.kTableProduct,
-      dVersion: dVersion,
-      fromMap: Product.fromMap,
-    );
-
-    final productBaseDAO = RDAO<ProductBase>(
-      dbName: dbName,
-      tableName: config.kTableProductBase,
-      dVersion: dVersion,
-      fromMap: ProductBase.fromMap,
-    );
-
-    final productImageDAO = RDAO<ProductImage>(
-      dbName: dbName,
-      tableName: config.kTableProductImage,
-      dVersion: dVersion,
-      fromMap: ProductImage.fromMap,
-    );
-
-    var manufacturerList = await manufacturerDAO.queryAll();
-    var productList = await productDAO.queryAll();
-    var productBaseList = await productBaseDAO.queryAll();
-    var productImageList = await productImageDAO.queryAll();
-
-    for(var item in productList)
-    {
-      ProductInstance instace = ProductInstance(
-        name: productBaseList[item.pbid! -1].pName, 
-        manufacturer: manufacturerList[item.mfid! -1].mName, 
-        price: item.basePrice, 
-        imageUrl: productImageList[(item.pbid! - 1) * 3].imagePath,
-        pbid: item.pbid! - 1,
-        mfid: item.mfid! -1);  
-        bool isHas = false;
-        if(_allProducts.isNotEmpty)
-        {
-          for(var inst in _allProducts)
-          {
-            if(inst.pbid == item.pbid! -1)
-            {
-              isHas = true;
-              break;
-            }
-          }
-        }
-        if(isHas == false)
-        {
-          _allProducts.add(instace);
-        }
+    // 2) pbid 목록 수집
+    final pbids = <int>{};
+    for (final pb in pbs) {
+      if (pb.id != null) pbids.add(pb.id!);
     }
-    setState(() {
-    _filteredProducts = List.from(_allProducts);
-  });
 
+    // 3) pbid -> Product(대표 1개) 캐싱 + mfid 수집
+    final prodMap = <int, Product>{};
+    final mfids = <int>{};
+
+    for (final pbid in pbids) {
+      try {
+        final list = await productDAO.queryK({'pbid': pbid});
+        final prod = list.first;
+        prodMap[pbid] = prod;
+
+        // Product에 mfid가 있다고 가정 (네 구조상 여기 있어야 함)
+        if (prod.mfid != null) {
+          mfids.add(prod.mfid!);
+        }
+      } catch (_) {
+        // Product가 없으면 그냥 스킵
+      }
+    }
+
+    // 4) mfid -> Manufacturer 캐싱
+    final mfMap = <int, Manufacturer>{};
+    for (final mfid in mfids) {
+      try {
+        final list = await manufacturerDAO.queryK({'id': mfid});
+        mfMap[mfid] = list.first;
+      } catch (_) {
+        // Manufacturer가 없으면 스킵
+      }
+    }
+
+    // 5) pbid -> ProductImage(대표 1장) 캐싱
+    final imgMap = <int, ProductImage>{};
+    for (final pbid in pbids) {
+      try {
+        final list = await productImageDAO.queryK({'pbid': pbid});
+        imgMap[pbid] = list.first;
+      } catch (_) {
+        // 이미지 없으면 스킵
+      }
+    }
+
+    // 6) 상태 반영
+    setState(() {
+      _allPBs = pbs;
+      _filteredPBs = pbs;
+
+      _prodMap = prodMap;
+      _mfMap = mfMap;
+      _imgMap = imgMap;
+
+      _loading = false;
+    });
   }
 
   void _onSearchChanged(String keyword) {
-    setState(() {
-      if (keyword.trim().isEmpty) {
-        _filteredProducts = List.from(_allProducts);
-      } else {
-        final lower = keyword.toLowerCase();
-        _filteredProducts = _allProducts.where((p) {
-          return p.name.toLowerCase().contains(lower) ||
-              p.manufacturer.toLowerCase().contains(lower);
-        }).toList();
-      }
-    });
+    if (keyword.trim().isEmpty) {
+      _filteredPBs = _allPBs;
+    } else {
+      final lower = keyword.toLowerCase();
+      _filteredPBs = _allPBs!.where((p) {
+        return p.pName.toLowerCase().contains(lower);
+      }).toList();
+    }
+    setState(() {});
   }
 
   @override
@@ -241,6 +269,7 @@ late List<ProductInstance> _allProducts;
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
             onPressed: () {
+              _loadUserInfo();
               Scaffold.of(context).openDrawer(); // 🔥 Drawer 열기
             },
           ),
@@ -264,8 +293,10 @@ late List<ProductInstance> _allProducts;
                 hintText: '원하는 신발을 찾아보아요',
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 0,
+                ),
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
@@ -277,37 +308,104 @@ late List<ProductInstance> _allProducts;
 
           // 🥿 상품 카드 2열 그리드
           Expanded(
-            child: _filteredProducts.isEmpty
-            ? Center(child: CircularProgressIndicator())
-            :GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,      // 한 줄에 2개
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.75, // 카드 세로 비율
-              ),
-              itemCount: _filteredProducts.length,
-              itemBuilder: (context, index) {
-                final p = _filteredProducts[index];
-                return _ProductCard(product: p);
-              },
-            ),
+            child: _loading
+                ? const Center(child: CircularProgressIndicator())
+                : GridView.builder(
+                    padding: const EdgeInsets.all(8),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.75,
+                        ),
+                    itemCount: _filteredPBs!.length,
+                    itemBuilder: (context, index) {
+                      final pb = _filteredPBs![index];
+                      final pbid = pb.id;
+
+                      final prod = (pbid != null) ? _prodMap[pbid] : null;
+                      final mf = (prod?.mfid != null)
+                          ? _mfMap[prod!.mfid!]
+                          : null;
+                      final img = (pbid != null) ? _imgMap[pbid] : null;
+
+                      final priceText = (prod?.basePrice ?? 0)
+                          .toString(); // ✅ Product.basePrice
+
+                      return GestureDetector(
+                        onTap: () {
+                          if (pbid == null) return;
+                          Get.toNamed('/detailview', arguments: pbid);
+                        },
+                        child: Card(
+                          elevation: 3,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: _buildImage(img), // ✅ pb 필요 없음
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  pb.pName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  mf?.mName ?? '제조사 없음',
+                                  style: const TextStyle(color: Colors.grey),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  '$priceText원',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildImage(ProductImage? img) {
+    final path = img?.imagePath;
+    if (path != null && path.isNotEmpty) {
+      return Image.asset(path, fit: BoxFit.cover, width: double.infinity);
+    }
+    return Image.asset(
+      'assets/images/no_image.png',
+      fit: BoxFit.cover,
+      width: double.infinity,
+    );
+  }
+
   Drawer _buildUserDrawer() {
-    // 저장된 사용자 정보 사용 (이미 _loadUserInfo()에서 로드됨)
-    // 드로워가 열릴 때마다 최신 정보로 갱신
-    _loadUserInfo();
-    
-    final userInitial = _userName.isNotEmpty && _userName != '사용자' 
-        ? _userName[0].toUpperCase() 
+    final userInitial = _userName.isNotEmpty && _userName != '사용자'
+        ? _userName[0].toUpperCase()
         : 'U';
-    
+
     // 디버깅: 드로워 빌드 시 사용자 정보 확인
     print('=== Drawer 빌드 - 사용자 정보 ===');
     print('  - userName: $_userName');
@@ -322,9 +420,7 @@ late List<ProductInstance> _allProducts;
           UserAccountsDrawerHeader(
             accountName: Text(_userName),
             accountEmail: Text(_userEmail),
-            currentAccountPicture: CircleAvatar(
-              child: Text(userInitial),
-            ),
+            currentAccountPicture: CircleAvatar(child: Text(userInitial)),
           ),
           ListTile(
             leading: const Icon(Icons.person),
@@ -395,7 +491,7 @@ late List<ProductInstance> _allProducts;
               );
             },
           ),
-        
+
           ListTile(
             leading: const Icon(Icons.add_box),
             title: const Text('테스트 페이지로 이동'),
@@ -419,59 +515,3 @@ late List<ProductInstance> _allProducts;
                         minimumSize: const Size(double.infinity, 56),
                       ),
 */
-
-class _ProductCard extends StatelessWidget {
-  final ProductInstance product;
-
-  const _ProductCard({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 이미지 영역
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  product.imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              product.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              product.manufacturer,
-              style: const TextStyle(color: Colors.grey),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              '${product.price}원',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
