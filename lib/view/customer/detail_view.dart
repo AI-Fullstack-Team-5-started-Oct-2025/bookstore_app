@@ -14,6 +14,7 @@ import 'package:get/get.dart';
   Update log: 
     DUMMY 00/00/0000 00:00, 'Point X, Description', Creator: Chansol, Park
     12/12/2025 10:18, 'Point 1, Adjusting Quantity and move to Add cart page', Creator: Chansol, Park
+    13/12/2025 16:50, 'Point 2, Actual connection to DB', Creator: Chansol, Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DetailView page
@@ -31,15 +32,17 @@ class DetailView extends StatefulWidget {
 
 class _DetailViewState extends State<DetailView> {
   //  Property
-  late Product dProduct; //  Dummy Product
-  late ProductBase dProductBase; //  Dummy ProductBase
-  late ProductImage dProductImage; //  Dummy ProductImage
-  late Manufacturer dManufacturer; //  Dummy Manufacturer
+  // late Product dProduct; //  Dummy Product
+  // late ProductBase dProductBase; //  Dummy ProductBase
+  // late ProductImage dProductImage; //  Dummy ProductImage
+  // late Manufacturer dManufacturer; //  Dummy Manufacturer
 
   Product? product;
+  String? prodColor;
   List<Product>? productSizes;
   ProductBase? productBase;
   List<ProductBase>? productColors;
+  List<String>? pbColors;
   ProductImage? productImage;
   Manufacturer? manufacturer;
 
@@ -54,7 +57,9 @@ class _DetailViewState extends State<DetailView> {
   }
 
   Future<void> svInitDB() async {
-    await DBCreation.creation(dbName, dVersion);
+    // await DBCreation.creation(dbName, dVersion);
+    //  Point 2
+    final int arg = Get.arguments;  //  Get pbid from SearchView
     final productDAO = RDAO<Product>(
       dbName: dbName,
       tableName: config.kTableProduct,
@@ -79,34 +84,42 @@ class _DetailViewState extends State<DetailView> {
       dVersion: dVersion,
       fromMap: Manufacturer.fromMap,
     );
-    dProductBase = ProductBase(
-      pName: 'Dummy',
-      pDescription: 'This is Dummy description',
-      pColor: 'Black',
-      pGender: 'Male',
-      pStatus: 'Null',
-      pCategory: 'Dummy Category',
-      pModelNumber: 'Hebi.2',
-    );
-    dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
-    dProductImage = ProductImage(
-      pbid: dProductBase.id,
-      imagePath:
-          '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
-    );
-    dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
-    dManufacturer = Manufacturer(mName: 'Nikke');
-    dManufacturer.id = await manufacturerDAO.insertK(dManufacturer.toMap());
-    dProduct = Product(
-      pbid: dProductBase.id,
-      mfid: dManufacturer.id,
-      size: 250,
-      basePrice: 10500,
-      pQuantity: 5
-    );
-    dProduct.id = await productDAO.insertK(dProduct.toMap());
-    product = (await productDAO.queryK({'id': dProduct.id})).first;
-    productBase = (await productbaseDAO.queryK({'id': product!.pbid})).first;
+    // dProductBase = ProductBase(
+    //   pName: 'Dummy',
+    //   pDescription: 'This is Dummy description',
+    //   pColor: 'Black',
+    //   pGender: 'Male',
+    //   pStatus: 'Null',
+    //   pCategory: 'Dummy Category',
+    //   pModelNumber: 'Hebi.2',
+    // );
+    // dProductBase.id = await productbaseDAO.insertK(dProductBase.toMap());
+    // dProductImage = ProductImage(
+    //   pbid: dProductBase.id,
+    //   imagePath:
+    //       '${config.kImageAssetPath}Newbalance_U740WN2/Newbalnce_U740WN2_Black_01.png',
+    // );
+    // dProductImage.id = await productImageDAO.insertK(dProductImage.toMap());
+    // dManufacturer = Manufacturer(mName: 'Nikke');
+    // dManufacturer.id = await manufacturerDAO.insertK(dManufacturer.toMap());
+    // dProduct = Product(
+    //   pbid: dProductBase.id,
+    //   mfid: dManufacturer.id,
+    //   size: 250,
+    //   basePrice: 10500,
+    //   pQuantity: 5
+    // );
+    // dProduct.id = await productDAO.insertK(dProduct.toMap());
+    // product = (await productDAO.queryK({'id': dProduct.id})).first;
+
+
+    //  Point 2
+    productBase = (await productbaseDAO.queryK({'id': arg})).first; //  Query actual ProductBase
+    final int pbid = productBase!.id as int;
+    print('PB체크: $pbid');
+    prodColor = productBase!.pColor;
+    print(prodColor);
+    product = (await productDAO.queryK({'pbid': arg})).first;
     productSizes = await productDAO.queryK({'pbid': productBase!.id});
     productImage = (await productImageDAO.queryK({
       'pbid': product!.pbid,
