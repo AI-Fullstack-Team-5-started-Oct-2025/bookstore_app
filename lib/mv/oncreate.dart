@@ -16,6 +16,7 @@ import 'package:sqflite/sqflite.dart';
     12/12/2025 15:28, 'Point 6, Modified PurchaseItem pcStatus', Creator: Chansol Park
     12/12/2025 16:43, 'Point 7, Modified PurchaseItem uid', Creator: Chansol Park
     12/12/2025 20:23, 'Point 8, Modified PurchaseItem uid -> pcid, Created Purchase', Creator: Chansol Park
+    13/12/2025 13:47, 'Point 9, Created Retail', Creator: Chansol Park
   Version: 1.0
   Dependency: SQFlite, Path, collection
   Desc: DB DAO presets
@@ -141,6 +142,16 @@ class DBCreation {
             lVersion REAL,
             lAddress text,
             lPaymentMethod text
+          )
+        ''');
+
+        //  Retail
+        await db.execute('''
+          create table Retail (
+            id integer primary key autoincrement,
+            pid integer,
+            eid integer,
+            rQuantity integer
           )
         ''');
       },
