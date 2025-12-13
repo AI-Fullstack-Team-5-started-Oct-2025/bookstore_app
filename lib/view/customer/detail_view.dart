@@ -22,6 +22,7 @@ import 'package:bookstore_app/model/product/product_base.dart';
 import 'package:bookstore_app/model/product/product_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class DetailView extends StatefulWidget {
   const DetailView({super.key});
@@ -108,7 +109,10 @@ class _DetailViewState extends State<DetailView> {
   }
 
   /// 색상 선택 시: 해당 색상의 ProductBase로 교체하고, 연관(Product/이미지/제조사/사이즈) 재로딩
-  Future<void> _applyColor(ProductBase newPB, {bool setChipIndex = true}) async {
+  Future<void> _applyColor(
+    ProductBase newPB, {
+    bool setChipIndex = true,
+  }) async {
     if (switching) return;
 
     setState(() => switching = true);
@@ -184,7 +188,10 @@ class _DetailViewState extends State<DetailView> {
             const SizedBox(height: 40),
             Align(
               alignment: Alignment.topLeft,
-              child: Text('     상품명: ${productBase!.pName}', style: config.rLabel),
+              child: Text(
+                '     상품명: ${productBase!.pName}',
+                style: config.rLabel,
+              ),
             ),
 
             const SizedBox(height: 40),
@@ -215,7 +222,10 @@ class _DetailViewState extends State<DetailView> {
                   itemBuilder: (context, index) {
                     final size = productSizes![index].size;
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blue,
                         borderRadius: BorderRadius.circular(12),
@@ -251,12 +261,17 @@ class _DetailViewState extends State<DetailView> {
                     setState(() => selectedColorIndex = index);
 
                     // 실제 데이터 갈아끼우기
-                    await _applyColor(productColors![index], setChipIndex: false);
+                    await _applyColor(
+                      productColors![index],
+                      setChipIndex: false,
+                    );
                   },
                   selectedColor: Colors.deepPurple.shade100,
                   backgroundColor: Colors.grey.shade200,
                   labelStyle: TextStyle(
-                    color: selectedColorIndex == index ? Colors.black : Colors.grey.shade600,
+                    color: selectedColorIndex == index
+                        ? Colors.black
+                        : Colors.grey.shade600,
                   ),
                 );
               }),
@@ -290,7 +305,10 @@ class _DetailViewState extends State<DetailView> {
                           icon: const Icon(Icons.remove),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
@@ -320,17 +338,49 @@ class _DetailViewState extends State<DetailView> {
                           ),
                           elevation: 0,
                         ),
-                        onPressed: () {
-                          if (product == null) return;
-                          Get.toNamed(
-                            '/cart',
-                            arguments: {
-                              'product': product!,
-                              'quantity': quantity,
-                              'pbid': productBase!.id,
-                              'color': productBase!.pColor,
-                              'manufacturer': manufacturer?.mName,
-                            },
+                        onPressed: () async {
+                          if (product == null || productBase == null) return;
+
+                          final box = GetStorage();
+
+                          // 기존 cart 불러오기 (없으면 빈 리스트)
+                          final List<dynamic> raw = box.read('cart') ?? [];
+                          final List<Map<String, dynamic>> cart = raw
+                              .map((e) => Map<String, dynamic>.from(e))
+                              .toList();
+
+                          // 지금 담을 아이템(필요한 정보 넉넉히 저장)
+                          final item = <String, dynamic>{
+                            'productId': product!.id, // Product PK
+                            'pbid': product!.pbid, // ProductBase FK
+                            'mfid': product!.mfid, // Manufacturer FK
+                            'name': productBase!.pName, // 표시용
+                            'color': productBase!.pColor, // 표시/구매옵션
+                            'size': product!.size, // 표시/구매옵션
+                            'unitPrice': product!
+                                .basePrice, // 가격 (Product에 있음) :contentReference[oaicite:0]{index=0}
+                            'quantity': quantity ?? 1,
+                            'imagePath': productImage?.imagePath, // 표시용
+                          };
+
+                          // 같은 상품(예: productId 기준) 있으면 수량 누적
+                          final idx = cart.indexWhere(
+                            (e) => e['productId'] == item['productId'],
+                          );
+                          if (idx >= 0) {
+                            cart[idx]['quantity'] =
+                                (cart[idx]['quantity'] as int) +
+                                (item['quantity'] as int);
+                          } else {
+                            cart.add(item);
+                          }
+
+                          await box.write('cart', cart);
+
+                          Get.snackbar(
+                            '장바구니',
+                            '담겼음!',
+                            snackPosition: SnackPosition.BOTTOM,
                           );
                         },
                         child: Text('Add Cart', style: config.rLabel),
