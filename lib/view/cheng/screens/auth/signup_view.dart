@@ -1,13 +1,21 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import 'custom/custom.dart';
-import 'custom/custom_common_util.dart';
-import '../../Restitutor_custom/dao_custom.dart';
-import '../../config.dart' as config;
-import '../../model/customer.dart';
-import '../../model/login_history.dart';
-import 'package:bookstore_app/db_setting.dart';
-import 'login_screen.dart';
+
+// Local imports - Core
+import '../../../../Restitutor_custom/dao_custom.dart';
+import '../../../../config.dart' as config;
+import '../../../../model/customer.dart';
+import '../../../../model/login_history.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+import '../../custom/util/log/custom_log_util.dart';
+
+// Local imports - Screens
+import 'login_view.dart';
 
 /// 회원가입 · 약관 동의 화면
 /// 사용자가 회원가입을 진행하는 화면입니다.
@@ -16,20 +24,20 @@ import 'login_screen.dart';
 /// [testData] 테스트용 더미 데이터 (선택사항)
 /// - 더미 데이터가 제공되면 폼에 자동으로 입력됩니다.
 /// - 회원가입 로직 검증을 위해 사용됩니다.
-class SignUpScreen extends StatefulWidget {
+class SignUpView extends StatefulWidget {
   /// 테스트용 더미 데이터 (선택사항)
   /// 더미 데이터가 제공되면 폼에 자동으로 입력됩니다.
   final Map<String, String>? testData;
 
-  const SignUpScreen({super.key, this.testData});
+  const SignUpView({super.key, this.testData});
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  State<SignUpView> createState() => _SignUpViewState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpViewState extends State<SignUpView> {
   // Form 검증을 위한 키
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(debugLabel: 'SignUpForm');
 
   // 이메일 입력 컨트롤러
   final TextEditingController _emailController = TextEditingController();
@@ -60,8 +68,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // 회원가입 진행 중 상태 (로딩 인디케이터 표시용)
   bool _isSigningUp = false;
 
-  // 데이터베이스 설정 객체 (initState에서 초기화)
-  late final DbSetting dbSetting;
   // 고객 데이터 접근 객체 (initState에서 초기화)
   late final RDAO<Customer> customerDAO;
   // 로그인 히스토리 데이터 접근 객체 (initState에서 초기화)
@@ -71,8 +77,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     
-    // 상태 관리 변수 초기화
-    dbSetting = DbSetting();
     customerDAO = RDAO<Customer>(
       dbName: dbName,
       tableName: config.kTableCustomer,
@@ -521,18 +525,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
       // 이메일이 없으면 정상 (EMPTY 예외는 무시)
       // queryK 함수는 결과가 없으면 'EMPTY' 예외를 발생시키므로, 이를 정상 케이스로 처리합니다.
       if (e.toString().contains('EMPTY')) {
-        // 이메일이 없으므로 계속 진행 (중복 없음)
       } else {
-        // 다른 에러 발생 시 에러 메시지 표시
-        print('이메일 중복 확인 에러: $e');
+        AppLogger.e('이메일 중복 확인 에러', tag: 'SignUp', error: e);
         CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다');
         return;
       }
     }
 
-    // 전화번호 중복 확인
-    // DB에서 동일한 전화번호를 가진 고객이 이미 존재하는지 확인합니다.
-    // 중복된 전화번호가 있으면 회원가입을 중단합니다.
     try {
       final existingCustomers = await customerDAO.queryK({'cPhoneNumber': phone});
       if (existingCustomers.isNotEmpty) {
@@ -540,13 +539,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         return;
       }
     } catch (e) {
-      // 전화번호가 없으면 정상 (EMPTY 예외는 무시)
-      // queryK 함수는 결과가 없으면 'EMPTY' 예외를 발생시키므로, 이를 정상 케이스로 처리합니다.
       if (e.toString().contains('EMPTY')) {
-        // 전화번호가 없으므로 계속 진행 (중복 없음)
       } else {
-        // 다른 에러 발생 시 에러 메시지 표시
-        print('전화번호 중복 확인 에러: $e');
+        AppLogger.e('전화번호 중복 확인 에러', tag: 'SignUp', error: e);
         CustomSnackBar.showError(context, message: '회원가입 중 오류가 발생했습니다');
         return;
       }
@@ -619,7 +614,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         // 잠시 대기 후 회원 로그인 페이지로 이동
         await Future.delayed(const Duration(milliseconds: 500));
         // 현재 화면을 모두 제거하고 로그인 화면으로 이동
-        Get.offAll(() => const LoginScreen());
+        Get.offAll(() => const LoginView());
       } else {
         // 삽입 실패 (insertedId가 0이면 실패)
         CustomSnackBar.showError(context, message: '회원가입에 실패했습니다. 다시 시도해주세요.');

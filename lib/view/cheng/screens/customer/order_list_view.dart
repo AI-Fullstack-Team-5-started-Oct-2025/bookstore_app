@@ -1,21 +1,32 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import '../../config.dart' as config;
-import 'custom/custom.dart';
-import 'customer_sub_dir/customer_order_card.dart';
-import 'order_detail_screen.dart';
+
+// Local imports - Core
+import '../../../../config.dart' as config;
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+
+// Local imports - Sub directories
+import '../../widgets/customer/customer_order_card.dart';
+
+// Local imports - Screens
+import 'order_detail_view.dart';
 
 /// 고객용 주문 목록 화면
 /// 모바일 세로 화면에 최적화된 주문 목록 화면입니다.
 /// 검색 필터와 주문 카드 리스트를 표시하며, 카드를 탭하면 상세 페이지로 이동합니다.
-class OrderListScreen extends StatefulWidget {
-  const OrderListScreen({super.key});
+class OrderListView extends StatefulWidget {
+  const OrderListView({super.key});
 
   @override
-  State<OrderListScreen> createState() => _OrderListScreenState();
+  State<OrderListView> createState() => _OrderListViewState();
 }
 
-class _OrderListScreenState extends State<OrderListScreen> {
+class _OrderListViewState extends State<OrderListView> {
   /// 검색 필터 입력을 위한 텍스트 컨트롤러
   final TextEditingController _searchController = TextEditingController();
 
@@ -126,7 +137,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                       onTap: () {
                         // 카드 클릭 시 주문 상세 페이지로 이동 (arguments로 orderId 전달)
                         Get.to(
-                          () => OrderDetailScreen(orderId: order['orderId'] as String),
+                          () => OrderDetailView(orderId: order['orderId'] as String),
                         );
                       },
                       child: CustomerOrderCard(

@@ -1,29 +1,38 @@
+// Flutter imports
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import 'custom/custom.dart';
-import 'admin_employee_order_view.dart';
-import 'employee_sub_dir/admin_drawer.dart';
-import 'employee_sub_dir/return_order_card.dart';
-import 'employee_sub_dir/return_order_detail_view.dart';
-import 'employee_sub_dir/admin_tablet_utils.dart';
-import 'employee_sub_dir/admin_storage.dart';
-import 'admin_profile_edit.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+import '../../custom/util/log/custom_log_util.dart';
+
+// Local imports - Sub directories
+import '../../widgets/admin/admin_drawer.dart';
+import '../../storage/admin_storage.dart';
+import '../../utils/admin_tablet_utils.dart';
+import '../../widgets/admin/return_order_card.dart';
+import '../../widgets/admin/return_order_detail_view.dart';
+
+// Local imports - Screens
+import 'admin_order_view.dart';
+import 'admin_profile_edit_view.dart';
 
 /// 관리자/직원 반품 관리 화면
 /// 태블릿에서 가로 모드로 강제 표시되는 반품 관리 화면입니다.
 /// 좌측에 반품 주문 목록을 표시하고, 우측에 선택된 반품 주문의 상세 정보를 표시합니다.
 
-class AdministerEmployeeReturnOrderView extends StatefulWidget {
-  const AdministerEmployeeReturnOrderView({super.key});
+class AdminReturnOrderView extends StatefulWidget {
+  const AdminReturnOrderView({super.key});
 
   @override
-  State<AdministerEmployeeReturnOrderView> createState() =>
-      _AdministerEmployeeReturnOrderViewState();
+  State<AdminReturnOrderView> createState() =>
+      _AdminReturnOrderViewState();
 }
 
-class _AdministerEmployeeReturnOrderViewState
-    extends State<AdministerEmployeeReturnOrderView> {
+class _AdminReturnOrderViewState
+    extends State<AdminReturnOrderView> {
   /// 검색 필터 입력을 위한 텍스트 컨트롤러
   final TextEditingController _searchController = TextEditingController();
 
@@ -90,7 +99,7 @@ class _AdministerEmployeeReturnOrderViewState
             menuType: AdminMenuType.orderManagement,
             onTap: () {
               Get.off(
-                () => const AdministerEmployeeOrderView(),
+                () => const AdminOrderView(),
                 transition: Transition.noTransition,
               );
             },
@@ -105,16 +114,10 @@ class _AdministerEmployeeReturnOrderViewState
           ),
         ],
         onProfileEditTap: () async {
-          // 개인정보 수정 페이지로 이동하고 결과를 받아서 드로워 갱신
-          final result = await Get.to(() => const AdminProfileEditScreen());
-          // 개인정보 수정이 완료되면 드로워를 갱신하기 위해 setState 호출
+          final result = await Get.to(() => const AdminProfileEditView());
           if (result == true) {
-            print('[DEBUG] 관리자 개인정보 수정 완료 - drawer 갱신');
-            setState(() {
-              // AdminStorage에서 최신 정보를 다시 읽어서 드로워가 갱신되도록 함
-              // AdminDrawer는 userName과 userRole을 파라미터로 받으므로,
-              // setState로 build 메서드가 다시 실행되면 AdminStorage에서 최신 정보를 읽어옴
-            });
+            AppLogger.d('관리자 개인정보 수정 완료 - drawer 갱신', tag: 'ReturnOrderView');
+            setState(() {});
           }
         },
       ),

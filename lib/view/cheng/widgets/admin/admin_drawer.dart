@@ -1,7 +1,14 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import '../custom/custom.dart';
-import '../theme/app_colors.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+
+// Local imports - Theme
+import '../../theme/app_colors.dart';
 
 /// 관리자 메뉴 타입 열거형
 /// 관리자 화면에서 사용 가능한 메뉴 종류를 정의합니다.
@@ -46,7 +53,7 @@ class AdminDrawerMenuItem {
 ///         // 주문 관리 페이지로 이동
 ///         break;
 ///       case AdminMenuType.returnManagement:
-///         Get.off(() => AdministerEmployeeReturnOrderView());
+///         Get.off(() => AdminReturnOrderView());
 ///         break;
 ///     }
 ///   },

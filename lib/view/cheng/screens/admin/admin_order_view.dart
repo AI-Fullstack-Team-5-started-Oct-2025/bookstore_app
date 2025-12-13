@@ -1,35 +1,44 @@
+// Flutter imports
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
 
-import '../../model/customer.dart';
-import 'custom/custom.dart';
-import 'admin_employee_return_order_view.dart';
-import 'package:bookstore_app/db_setting.dart';
-import 'employee_sub_dir/admin_drawer.dart';
-import 'employee_sub_dir/order_card.dart';
-import 'employee_sub_dir/order_detail_view.dart';
-import 'employee_sub_dir/admin_tablet_utils.dart';
-import 'employee_sub_dir/admin_storage.dart';
-import 'admin_profile_edit.dart';
-import '../../Restitutor_custom/dao_custom.dart';
-import '../../config.dart' as config;
-import 'package:bookstore_app/model/employee.dart';
+// Local imports - Core
+import '../../../../Restitutor_custom/dao_custom.dart';
+import '../../../../config.dart' as config;
+import '../../../../model/customer.dart';
+import '../../../../model/employee.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+import '../../custom/util/log/custom_log_util.dart';
+
+// Local imports - Sub directories
+import '../../widgets/admin/admin_drawer.dart';
+import '../../storage/admin_storage.dart';
+import '../../utils/admin_tablet_utils.dart';
+import '../../widgets/admin/order_card.dart';
+import '../../widgets/admin/order_detail_view.dart';
+
+// Local imports - Screens
+import 'admin_return_order_view.dart';
+import 'admin_profile_edit_view.dart';
 
 /// 관리자/직원 주문 관리 화면
 /// 태블릿에서 가로 모드로 강제 표시되는 주문 관리 화면입니다.
 /// 좌측에 주문 목록을 표시하고, 우측에 선택된 주문의 상세 정보를 표시합니다.
 
-class AdministerEmployeeOrderView extends StatefulWidget {
-  const AdministerEmployeeOrderView({super.key});
+class AdminOrderView extends StatefulWidget {
+  const AdminOrderView({super.key});
 
   @override
-  State<AdministerEmployeeOrderView> createState() =>
-      _AdministerEmployeeOrderViewState();
+  State<AdminOrderView> createState() =>
+      _AdminOrderViewState();
 }
 
-class _AdministerEmployeeOrderViewState
-    extends State<AdministerEmployeeOrderView> {
+class _AdminOrderViewState
+    extends State<AdminOrderView> {
   /// 검색 필터 입력을 위한 텍스트 컨트롤러
   final TextEditingController _searchController = TextEditingController();
 
@@ -45,8 +54,6 @@ class _AdministerEmployeeOrderViewState
     {'orderId': 'ORD003', 'customerName': '이영희', 'orderStatus': '대기중'},
   ];
 
-  /// 데이터베이스 설정 객체 (initState에서 초기화)
-  late final DbSetting dbSetting;
   /// 직원 데이터 접근 객체 (initState에서 초기화)
   late final RDAO<Employee> employeeDAO;
   /// 고객 데이터 접근 객체 (initState에서 초기화)
@@ -73,8 +80,6 @@ class _AdministerEmployeeOrderViewState
   void initState() {
     super.initState();
     
-    // 상태 관리 변수 초기화
-    dbSetting = DbSetting();
     employeeDAO = RDAO<Employee>(
       dbName: dbName,
       tableName: config.tTableEmployee,
@@ -129,23 +134,17 @@ class _AdministerEmployeeOrderViewState
             menuType: AdminMenuType.returnManagement,
             onTap: () {
               Get.off(
-                () => const AdministerEmployeeReturnOrderView(),
+                () => const AdminReturnOrderView(),
                 transition: Transition.noTransition,
               );
             },
           ),
         ],
         onProfileEditTap: () async {
-          // 개인정보 수정 페이지로 이동하고 결과를 받아서 드로워 갱신
-          final result = await Get.to(() => const AdminProfileEditScreen());
-          // 개인정보 수정이 완료되면 드로워를 갱신하기 위해 setState 호출
+          final result = await Get.to(() => const AdminProfileEditView());
           if (result == true) {
-            print('[DEBUG] 관리자 개인정보 수정 완료 - drawer 갱신');
-            setState(() {
-              // AdminStorage에서 최신 정보를 다시 읽어서 드로워가 갱신되도록 함
-              // AdminDrawer는 userName과 userRole을 파라미터로 받으므로,
-              // setState로 build 메서드가 다시 실행되면 AdminStorage에서 최신 정보를 읽어옴
-            });
+            AppLogger.d('관리자 개인정보 수정 완료 - drawer 갱신', tag: 'OrderView');
+            setState(() {});
           }
         },
       ),

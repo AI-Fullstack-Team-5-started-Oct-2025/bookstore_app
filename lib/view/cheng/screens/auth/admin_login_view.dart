@@ -1,30 +1,40 @@
+// Flutter imports
 import 'package:flutter/material.dart';
+
+// Third-party package imports
 import 'package:get/get.dart';
-import '../../Restitutor_custom/dao_custom.dart';
-import '../../config.dart' as config;
-import '../../model/employee.dart';
-import 'custom/custom.dart';
-import 'custom/custom_common_util.dart';
-import 'package:bookstore_app/db_setting.dart';
-import 'employee_sub_dir/admin_tablet_utils.dart';
-import 'employee_sub_dir/admin_storage.dart';
-import 'admin_employee_order_view.dart';
-import 'admin_mobile_block_screen.dart';
+
+// Local imports - Core
+import '../../../../Restitutor_custom/dao_custom.dart';
+import '../../../../config.dart' as config;
+import '../../../../model/employee.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+import '../../custom/util/log/custom_log_util.dart';
+
+// Local imports - Sub directories
+import '../../utils/admin_tablet_utils.dart';
+import '../../storage/admin_storage.dart';
+
+// Local imports - Screens
+import '../admin/admin_order_view.dart';
+import '../admin/admin_mobile_block_view.dart';
 
 /// 관리자 로그인 화면
 /// 태블릿에서 가로 모드로 강제 표시되는 관리자 전용 로그인 화면입니다.
 /// 관리자는 회원가입이 불가능하며 로그인만 가능합니다.
 
-class AdminLoginScreen extends StatefulWidget {
-  const AdminLoginScreen({super.key});
+class AdminLoginView extends StatefulWidget {
+  const AdminLoginView({super.key});
 
   @override
-  State<AdminLoginScreen> createState() => _AdminLoginScreenState();
+  State<AdminLoginView> createState() => _AdminLoginViewState();
 }
 
-class _AdminLoginScreenState extends State<AdminLoginScreen> {
+class _AdminLoginViewState extends State<AdminLoginView> {
   /// Form 검증을 위한 키
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>(debugLabel: 'AdminLoginForm');
 
   /// 이메일 입력 컨트롤러
   final TextEditingController _emailController = TextEditingController();
@@ -32,8 +42,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   /// 비밀번호 입력 컨트롤러
   final TextEditingController _passwordController = TextEditingController();
 
-  /// 데이터베이스 설정 객체 (initState에서 초기화)
-  late final DbSetting dbSetting;
   /// 직원 데이터 접근 객체 (initState에서 초기화)
   late final RDAO<Employee> employeeDAO;
 
@@ -41,8 +49,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   void initState() {
     super.initState();
 
-    // 상태 관리 변수 초기화
-    dbSetting = DbSetting();
     employeeDAO = RDAO<Employee>(
       dbName: dbName,
       tableName: config.tTableEmployee,
@@ -55,7 +61,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     // 태블릿이 아니면 모바일 차단 화면으로 이동
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!isTablet(context)) {
-        Get.off(() => const AdminMobileBlockScreen());
+        Get.off(() => const AdminMobileBlockView());
       } else {
         // 태블릿이면 가로 모드로 고정
         lockTabletLandscape(context);
@@ -186,11 +192,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
       // 직원 DB에서 이메일 또는 전화번호와 비밀번호로 조회
       employeeDAO.queryK(queryMap).then((employees) {
         if (employees.isNotEmpty) {
-          // 로그인 성공
           final employee = employees.first;
-          print('관리자 로그인 성공: ${employee.eName}');
+          AppLogger.d('관리자 로그인 성공: ${employee.eName}', tag: 'AdminLogin');
           
-          // 관리자 정보를 get_storage에 저장
           AdminStorage.saveAdmin(employee);
           
           Get.snackbar(
@@ -198,13 +202,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             '${employee.eName}님 환영합니다!',
             snackPosition: SnackPosition.BOTTOM,
           );
-          // 주문 관리 화면으로 이동
           Get.off(
-            () => const AdministerEmployeeOrderView(),
+            () => const AdminOrderView(),
             transition: Transition.fadeIn,
           );
         } else {
-          // 로그인 실패
           Get.snackbar(
             '로그인 실패',
             '이메일/전화번호 또는 비밀번호가 올바르지 않습니다.',
@@ -214,8 +216,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           );
         }
       }).catchError((error) {
-        // 에러 처리
-        print('로그인 에러: $error');
+        AppLogger.e('로그인 에러', tag: 'AdminLogin', error: error);
         Get.snackbar(
           '오류',
           '로그인 중 오류가 발생했습니다.',

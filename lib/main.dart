@@ -1,7 +1,7 @@
 import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncreate.dart';
-import 'package:bookstore_app/view/cheng/login_screen.dart';
+import 'package:bookstore_app/view/cheng/screens/auth/login_view.dart';
 import 'package:bookstore_app/view/customer/address_payment_view.dart';
 import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> {
       ),
       initialRoute: '/',
       getPages: [
-        GetPage(name: '/', page: () => LoginScreen(),),
+        GetPage(name: '/', page: () => LoginView(),),
         GetPage(name: '/cart', page: () => Cart(),),
         GetPage(name: '/searchview', page: () => SearchView(),),
         GetPage(name: '/detailview', page: () => DetailView(),),

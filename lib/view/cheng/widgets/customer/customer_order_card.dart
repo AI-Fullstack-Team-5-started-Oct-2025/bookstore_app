@@ -1,5 +1,11 @@
+// Flutter imports
 import 'package:flutter/material.dart';
-import '../custom/custom.dart';
+
+// Local imports - Custom widgets & utilities
+import '../../custom/custom.dart';
+
+// Local imports - Utils
+import '../../utils/order_utils.dart';
 
 /// 고객용 주문 카드 위젯
 /// 고객용 주문 목록 화면에서 사용하는 주문 카드입니다.
@@ -68,7 +74,7 @@ class CustomerOrderCard extends StatelessWidget {
           // 총 주문 금액 표시 (있는 경우)
           if (totalPrice != null)
             CustomText(
-              '총 금액: ${_formatPrice(totalPrice!)}원',
+              '총 금액: ${formatPrice(totalPrice!)}원',
               fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.blue.shade700,
@@ -92,14 +98,6 @@ class CustomerOrderCard extends StatelessWidget {
       default:
         return Colors.grey;
     }
-  }
-
-  /// 가격 포맷팅 함수 (천 단위 콤마 추가)
-  String _formatPrice(int price) {
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
   }
 }
 
