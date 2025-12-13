@@ -6,6 +6,7 @@ import '../../custom/custom.dart';
 
 // Local imports - Utils
 import '../../utils/order_utils.dart';
+import '../../utils/order_status_colors.dart';
 
 /// 고객용 주문 카드 위젯
 /// 고객용 주문 목록 화면에서 사용하는 주문 카드입니다.
@@ -51,7 +52,7 @@ class CustomerOrderCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(orderStatus),
+                  color: OrderStatusColors.getStatusColor(orderStatus),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: CustomText(
@@ -84,20 +85,5 @@ class CustomerOrderCard extends StatelessWidget {
     );
   }
 
-  /// 주문 상태에 따른 색상 반환
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case '대기중':
-        return Colors.orange;
-      case '준비완료':
-        return Colors.blue;
-      case '픽업완료':
-        return Colors.green;
-      case '반품요청':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
 }
 

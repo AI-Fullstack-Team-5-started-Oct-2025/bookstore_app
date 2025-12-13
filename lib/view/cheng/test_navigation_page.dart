@@ -12,7 +12,6 @@ import '../../../model/login_history.dart';
 
 // Local imports - Custom widgets & utilities
 import 'custom/custom.dart';
-import 'custom/util/log/custom_log_util.dart';
 
 // Local imports - Screens
 import 'screens/customer/search_view.dart';
@@ -249,9 +248,7 @@ class TestNavigationPage extends StatelessWidget {
   Future<void> _printRecentCustomers(BuildContext context) async {
     try {
       // Customer DAO 생성
-      // 주의: svInitDB()를 호출하지 않습니다. 
-      // svInitDB()는 DB를 초기화하고 더미 데이터를 다시 삽입하므로,
-      // 조회만 할 때는 호출하면 안 됩니다.
+      // DB 초기화는 main.dart에서 이미 수행되므로 여기서는 호출하지 않습니다.
       final customerDAO = RDAO<Customer>(
         dbName: dbName,
         tableName: config.kTableCustomer,

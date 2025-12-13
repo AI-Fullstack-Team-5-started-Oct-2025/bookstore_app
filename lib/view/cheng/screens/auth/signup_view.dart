@@ -12,7 +12,6 @@ import '../../../../model/login_history.dart';
 
 // Local imports - Custom widgets & utilities
 import '../../custom/custom.dart';
-import '../../custom/util/log/custom_log_util.dart';
 
 // Local imports - Screens
 import 'login_view.dart';

@@ -10,6 +10,13 @@ import '../../custom/custom.dart';
 // Local imports - Theme
 import '../../theme/app_colors.dart';
 
+// Local imports - Storage
+import '../../storage/admin_storage.dart';
+
+// Local imports - Screens
+import '../../test_navigation_page.dart';
+import '../../screens/auth/admin_login_view.dart';
+
 /// 관리자 메뉴 타입 열거형
 /// 관리자 화면에서 사용 가능한 메뉴 종류를 정의합니다.
 enum AdminMenuType {
@@ -144,14 +151,60 @@ class AdminDrawer extends StatelessWidget {
       bottomChildren: [const Divider(height: 1)],
       footer: Padding(
         padding: const EdgeInsets.all(16),
-        child: CustomButton(
-          btnText: '개인정보 수정',
-          buttonType: ButtonType.outlined,
-          onCallBack: () {
-            Get.back();
-            onProfileEditTap?.call();
-          },
-          minimumSize: const Size(double.infinity, 48),
+        child: CustomColumn(
+          spacing: 12,
+          children: [
+            CustomButton(
+              btnText: '개인정보 수정',
+              buttonType: ButtonType.outlined,
+              onCallBack: () {
+                Get.back();
+                onProfileEditTap?.call();
+              },
+              minimumSize: const Size(double.infinity, 48),
+            ),
+            // 테스트 페이지로 이동 버튼
+            CustomButton(
+              btnText: '테스트 페이지로 이동',
+              buttonType: ButtonType.outlined,
+              onCallBack: () {
+                Get.back();
+                Get.to(() => const TestNavigationPage());
+              },
+              minimumSize: const Size(double.infinity, 48),
+            ),
+            // 로그아웃 버튼
+            CustomButton(
+              btnText: '로그아웃',
+              buttonType: ButtonType.outlined,
+              onCallBack: () {
+                Get.back();
+                // 로그아웃 확인 다이얼로그
+                Get.dialog(
+                  AlertDialog(
+                    title: const Text('로그아웃'),
+                    content: const Text('정말 로그아웃하시겠습니까?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: const Text('취소'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // 관리자 정보 삭제
+                          AdminStorage.clearAdmin();
+                          // 관리자 로그인 화면으로 이동 (모든 페이지 제거)
+                          Get.offAll(() => const AdminLoginView());
+                        },
+                        child: const Text('로그아웃'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              minimumSize: const Size(double.infinity, 48),
+            ),
+          ],
         ),
       ),
     );
