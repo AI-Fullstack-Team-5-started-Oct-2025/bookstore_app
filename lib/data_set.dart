@@ -1,10 +1,13 @@
 import 'package:bookstore_app/model/customer.dart';
 import 'package:bookstore_app/model/employee.dart';
+import 'package:bookstore_app/model/login_history.dart';
 import 'package:bookstore_app/model/product/manufacturer.dart';
 import 'package:bookstore_app/model/product/product.dart';
 import 'package:bookstore_app/model/product/product_base.dart';
 import 'package:bookstore_app/model/product/product_image.dart';
 import 'package:bookstore_app/config.dart' as config;
+import 'package:bookstore_app/model/sale/purchase.dart';
+import 'package:bookstore_app/model/sale/purchase_item.dart';
 
 class DataSet {
   
@@ -293,6 +296,60 @@ List<ProductImage> productImageList = [
   ),
 ];
 
+
+//  Total Assemble of Product
+// final Manufacturer exManufacturer = Manufacturer(mName: 'mName');
+// final ProductBase exPB = ProductBase(pName: 'pName', pDescription: 'pDescription', pColor: 'pColor', pGender: 'pGender', pStatus: 'pStatus', pCategory: 'pCategory', pModelNumber: 'pModelNumber');
+
+// final ProductImage exImage = ProductImage(pbid: exPB.id, imagePath: 'imagePath');
+
+
+// final Product exProduct = Product(pbid: exPB.id, mfid: exManufacturer.id, size: 250, basePrice: 10000, pQuantity: 30);
+
+// TableBatch productBatch = TableBatch(
+//   tableName: 'Product',
+//   rows: [
+//     {'pbid': 1, 'mfid': 1, 'size': 260, 'basePrice': 119000},
+//     {'pbid': 1, 'mfid': 1, 'size': 270, 'basePrice': 129000},
+//   ],
+// );
+
+// TableBatch manufacturerBatch = TableBatch(
+//   tableName: 'Manufacturer',
+//   rows: [
+//     {'mName': 'Nike'},
+//     {'mName': 'NewBalance'},
+//   ],
+// );
+
+// TableBatch imgBatch = TableBatch(
+//   tableName: 'ProductImage',
+//   rows: [
+//     {'pbid': 1, 'imagePath': 'images/nike_01.png'},
+//     {'pbid': 1, 'imagePath': 'images/nike_02.png'},
+//   ],
+// );
+
+// List<TableBatch> list = [productBatch,manufacturerBatch,imgBatch];
+// final multiBatch = MultiTableBatch(tables: [productBatch,manufacturerBatch,imgBatch]);
+
+// // final multiBatch = MultiTableBatch(
+// //   tables: [productBatch, manufacturerBatch, imgBatch],
+// // );
+
+// final assembly = AssemblyDBHandler(
+//   dbName: '${config.kDBName}${config.kDBFileExt}',
+//   dVersion: config.kVersion,
+// );
+
+// final result = await assembly.insertMultiTableBatch(multiBatch);
+// //  각각 Insert 이후에 배치로 묶어버리기
+
+// // final multiBatch = MultiTableBatch(tables: [exPB,exImage,exManufacturer,exProduct ]);
+
+
+
+
 List<Product> productList = [
 
   
@@ -421,40 +478,93 @@ Employee(
 
 List<Customer> customerList = [
   Customer(
+    id: 1,
     cEmail: 'jojo@han.com',
     cPhoneNumber: '222-9898-1212',
     cName: '조조',
     cPassword: 'qwer1234',
   ),
+
   Customer(
+    id: 2,
     cEmail: 'handbook@han.com',
     cPhoneNumber: '999-7676-1987',
     cName: '손책',
     cPassword: 'qwer1234',
   ),
   Customer(
+    id: 3,
     cEmail: 'bigear@han.com',
     cPhoneNumber: '000-1234-5678',
     cName: '유비',
     cPassword: 'qwer1234',
   ),
   Customer(
+    id: 4,
     cEmail: 'jangryo@han.com',
     cPhoneNumber: '222-3452-7665',
     cName: '장료',
     cPassword: 'qwer1234',
   ),
   Customer(
+    id: 5,
     cEmail: 'sixhand@han.com',
     cPhoneNumber: '999-1010-2929',
     cName: '육손',
     cPassword: 'qwer1234',
   ),
   Customer(
+    id: 6,
     cEmail: 'purpledraong@han.com',
     cPhoneNumber: '000-0987-6543',
     cName: '조자룡',
     cPassword: 'qwer1234',
   ),
+
 ];
+
+List<LoginHistory> loginHistoryList = [
+  LoginHistory(id: 1, cid: 1, loginTime: "2025-12-12 17:05", lStatus: '0', lVersion: 1, lAddress: '강남구', lPaymentMethod: 'KaKaoPay'),
+  LoginHistory(id: 2, cid: 1, loginTime: "2025-12-12 19:05", lStatus: '0', lVersion: 1, lAddress: '강남구', lPaymentMethod: 'KaKaoPay'),
+  LoginHistory(id: 3, cid: 1, loginTime: "2025-12-12 19:20", lStatus: '0', lVersion: 1, lAddress: '강남구', lPaymentMethod: 'KaKaoPay'),
+  LoginHistory(id: 4, cid: 2, loginTime: "2023-12-12 19:20", lStatus: '0', lVersion: 1, lAddress: '강남구', lPaymentMethod: 'KaKaoPay'),
+  LoginHistory(id: 5, cid: 3, loginTime: "2025-12-12 07:20", lStatus: '2', lVersion: 1, lAddress: '강남구', lPaymentMethod: 'KaKaoPay'),
+  LoginHistory(id: 6, cid: 4, loginTime: "2023-12-12 07:20", lStatus: '0', lVersion: 1, lAddress: '강남구', lPaymentMethod: 'KaKaoPay')
+];
+
+List<PurchaseItem> purchaseItemList = [
+  
+  PurchaseItem(pid: 1, pcid: 1, pcQuantity: 10, pcStatus: '결제 대기'),
+  PurchaseItem(pid: 2, pcid: 2, pcQuantity: 3, pcStatus: '결제 대기'),
+  PurchaseItem(pid: 3, pcid: 2, pcQuantity: 6, pcStatus: '결제 대기'),
+  PurchaseItem(pid: 4, pcid: 1, pcQuantity: 1, pcStatus: '결제 대기'),
+  PurchaseItem(pid: 5, pcid: 1, pcQuantity: 9, pcStatus: '결제 대기'),
+  PurchaseItem(pid: 6, pcid: 1, pcQuantity: 11, pcStatus: '결제 대기'),
+];
+
+List<Purchase> purchaseList = [
+
+Purchase(id: 1, cid: 1, pickupDate: "2023-12-14 07:20", orderCode: 'orderCode', timeStamp: "2023-12-12 07:20"),
+Purchase(id: 2, cid: 1, pickupDate: "2023-12-14 07:20", orderCode: 'orderCode', timeStamp: "2023-12-12 07:20"),
+Purchase(id: 3, cid: 1, pickupDate: "2023-12-14 07:20", orderCode: 'orderCode', timeStamp: "2023-12-12 07:20"),
+Purchase(id: 4, cid: 1, pickupDate: "2023-12-14 07:20", orderCode: 'orderCode', timeStamp: "2023-12-12 07:20"),
+Purchase(id: 5, cid: 1, pickupDate: "2023-12-14 07:20", orderCode: 'orderCode', timeStamp: "2023-12-12 07:20"),
+];
+// List<Purchase> purchaseList = [
+//   Purchase(pickupDate: pickupDate, orderCode: orderCode, timeStamp: timeStamp)
+// ]; 
+
+
+
+
+// Purchase purchase = Purchase(pickupDate: pickupDate, orderCode: orderCode, timeStamp: timeStamp)
+
+
+  // PurchaseItem 
+//   List<PurchaseItem> purchaseItemList = [
+// PurchaseItem(id: 1, pid: 1, pcQuantity: 1, pcStatus: '반송중')
+//   ];
+
+
+  // Purchase purchase = Purchase(pickupDate: pickupDate, orderCode: orderCode, timeStamp: timeStamp);
 }

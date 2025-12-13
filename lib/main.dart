@@ -1,7 +1,7 @@
 import 'package:bookstore_app/config.dart' as config;
 import 'package:bookstore_app/db_setting.dart';
 import 'package:bookstore_app/mv/oncreate.dart';
-
+import 'package:bookstore_app/view/cheng/screens/auth/login_view.dart';
 import 'package:bookstore_app/view/customer/address_payment_view.dart';
 import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
@@ -13,8 +13,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-
-import 'view/cheng/screens/auth/login_view.dart';
 
 // final GoRouter router = GoRouter(
 
