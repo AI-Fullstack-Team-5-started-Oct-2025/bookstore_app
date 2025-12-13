@@ -8,6 +8,7 @@
     12/12/2025 15:55, 'Point 3, PurchaseItem, LoginHistory table added', Creator: Chansol, Park
     12/12/2025 15:55, 'Point 4, pickupStatus, returnStatus, loginStatus, district added', Creator: zero
     13/12/2025 13:49, 'Point 5, Retail Model configuration added', Creator: Chansol Park
+    13/12/2025 21:42, 'Point 6, pickupStatus와 returnStatus를 통합', Creator: zero
   Version: 1.0
   Desc: Config for dbName, version, etc.
 */
@@ -79,18 +80,15 @@ const String routeProductDetail = '/product';
 const String routeCart = '/cart';
 const String routePurchaseHistory = '/history';
 
-
 // Pickup 상태
+// Point 6
 Map pickupStatus = {
   0 : '제품 준비 중',
   1 : '제품 준비 완료',
-  2 : '제품 수령 완료'};
-
-// Return 상태
-Map returnStatus = {
- 0 : '반품 신청',
- 1 : '반품 처리 중',
- 2 : '반품 완료'
+  2 : '제품 수령 완료',
+  3 : '반품 신청',
+  4 : '반품 처리 중',
+  5 : '반품 완료'
 };
 
 // 회원 상태 

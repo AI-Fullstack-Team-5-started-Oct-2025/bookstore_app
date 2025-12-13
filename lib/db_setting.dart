@@ -14,6 +14,7 @@ import 'package:bookstore_app/config.dart' as config;
     12/12/2025 11:16, 'Point 2, 필요 없는 데이터 삭제', Creator: zero
     12/12/2025 14:31, 'Point 3, data_set.dart에 있던 데이터를 가져오고 TableBatch를 이용하여 데이터 세팅', Creator: zero
     12/12/2025 22:00, 'Point 4, 회원관련 시나리오 수정, purchase, purchaseitem을 multibatch로 묶음', Creator: zero
+    13/12/2025 21:42, 'Point 5, purchaseitem 중복으로 들어가기에 하나 삭제', Creator: zero
 
   Version: 1.0
   Dependency: SQFlite, Path, collection
@@ -1183,9 +1184,11 @@ class DbSetting {
 
     final customerResult = await customerDAO.insertBatch(customerBatch);
     final employeeResult = await employeeDAO.insertBatch(employeeBatch);
-    final purchaseItemResult = await purchaseItem.insertBatch(
-      purchaseItemBatch,
-    );
+    
+    // Point 5
+    // final purchaseItemResult = await purchaseItem.insertBatch(
+    //   purchaseItemBatch,
+    // );
     final loginHistoryResult = await loginHistory.insertBatch(
       loginHistoryBatch,
     );
