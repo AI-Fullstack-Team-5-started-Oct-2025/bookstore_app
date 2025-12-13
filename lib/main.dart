@@ -7,8 +7,7 @@ import 'package:bookstore_app/view/customer/cart.dart';
 import 'package:bookstore_app/view/customer/detail_view.dart';
 import 'package:bookstore_app/view/customer/purchase_view.dart';
 import 'package:bookstore_app/view/customer/search_view.dart';
-import 'package:bookstore_app/view/login.dart';
-import 'package:bookstore_app/view/settings.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
